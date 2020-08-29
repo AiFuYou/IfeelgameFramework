@@ -1,0 +1,6 @@
+framework module Ifeelgame {
+  umbrella header "Ifeelgame.h"
+
+  export *
+  module * { export * }
+}

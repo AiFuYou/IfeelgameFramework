@@ -1,0 +1,3 @@
+include ':ifeelgame'
+include ':app'
+rootProject.name = "Ifeelgame_a"
