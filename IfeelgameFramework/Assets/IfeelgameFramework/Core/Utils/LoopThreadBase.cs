@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 
-namespace IfeelgameFramework.Utils
+namespace IfeelgameFramework.Core.Utils
 {
     public class LoopThread
     {
@@ -57,11 +57,11 @@ namespace IfeelgameFramework.Utils
     public class Loop
     {
         private readonly List<Action> _actionQueue;
-        private readonly ManualResetEvent _manualResetEvent;
+        private readonly ManualResetEventSlim _manualResetEvent;
 
         public Loop()
         {
-            _manualResetEvent = new ManualResetEvent(false);
+            _manualResetEvent = new ManualResetEventSlim(false);
             _actionQueue = new List<Action>();
         }
 
@@ -76,7 +76,7 @@ namespace IfeelgameFramework.Utils
 
         public void Prepare()
         {
-            _manualResetEvent.WaitOne();
+            _manualResetEvent.Wait();
             _manualResetEvent.Reset();
         }
 
