@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using IfeelgameFramework.Core.Logger;
+using IfeelgameFramework.Core.ObjectPool;
 using IfeelgameFramework.Core.Sound;
 using IfeelgameFramework.Core.Utils;
 using UnityEngine;
@@ -12,7 +13,9 @@ public class Demo : MonoBehaviour
         SoundManager.InitData();
         SoundManager.PlayMusic("bg");
         
-        DebugEx.Log("当前国家", NativeBridge.Instance.GetRegionName());
+        var gObj = new GameObject("12312");
+        GameObjectPool.Instance.Add("test", gObj);
+        GameObjectPool.Instance.Add("test", gObj);
     }
 
     // Update is called once per frame

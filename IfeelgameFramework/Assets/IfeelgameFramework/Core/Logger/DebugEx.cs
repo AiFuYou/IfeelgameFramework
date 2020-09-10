@@ -39,7 +39,7 @@ namespace IfeelgameFramework.Core.Logger
 
         public static void LogObject(object obj)
         {
-            DebugEx.Log(JsonConvert.SerializeObject(obj));
+            Log(JsonConvert.SerializeObject(obj));
         }
         
         [Conditional("LOG")]
