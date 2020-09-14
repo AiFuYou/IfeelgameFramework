@@ -31,7 +31,10 @@ namespace IfeelgameFramework.Core.Sound
             _audioClips = new Dictionary<string, AudioClip>();
         
             //添加音频播放组件
-            _soundManagerGameObject = new GameObject("SoundManager");
+            _soundManagerGameObject = new GameObject("SoundManager")
+            {
+                hideFlags = HideFlags.HideAndDontSave
+            };
             _soundManagerGameObject.AddComponent<SoundManagerComponent>();
             
         }
