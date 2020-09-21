@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
+using IfeelgameFramework.Core.Logger;
 using UnityEngine;
 
 namespace IfeelgameFramework.Core.Utils
@@ -46,8 +47,8 @@ namespace IfeelgameFramework.Core.Utils
                     }
                     catch (Exception e)
                     {
-                        Debug.LogError("Loop failed, but continue");
-                        Debug.LogException(e);
+                        DebugEx.Error("Loop failed, but continue");
+                        DebugEx.Exception(e);
                     }
                 }
             }
@@ -99,8 +100,8 @@ namespace IfeelgameFramework.Core.Utils
             }
             catch (Exception e)
             {
-                Debug.LogError("Execute callback failed");
-                Debug.LogException(e);
+                DebugEx.Error("Execute callback failed");
+                DebugEx.Exception(e);
             }
 
             return true;
