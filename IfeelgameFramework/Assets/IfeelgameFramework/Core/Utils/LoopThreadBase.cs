@@ -15,12 +15,16 @@ namespace IfeelgameFramework.Core.Utils
         private Loop _loop;
         private Thread _thread;
     
-        public void Start()
+        public void Start(string threadName)
         {
             _isExiting = false;
             _loop = new Loop();
             Handler = new Handler(_loop);
             _thread = new Thread(Run);
+            if (!string.IsNullOrEmpty(threadName))
+            {
+                _thread.Name = threadName;
+            }
             _thread.Start();
         }
 
