@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
 namespace IfeelgameFramework.Core.Utils
 {
@@ -22,7 +23,7 @@ namespace IfeelgameFramework.Core.Utils
             }
 
             FileRecordQueue queue;
-            System.Threading.Thread thread = null;
+            private Thread _thread = null;
             List<Job> jobs = new List<Job>();
 
             public bool isDone
@@ -50,15 +51,24 @@ namespace IfeelgameFramework.Core.Utils
                 this.queue = queue;
             }
 
+            private ManualResetEventSlim _mres = null;
             void AddAction(Job job)
             {
                 _isDone = false;
-                jobs.Add(job);
-                if (thread == null)
+                
+                lock (jobs)
                 {
-                    thread = new System.Threading.Thread(DoJobs);
-                    thread.Start();
+                    jobs.Add(job);
                 }
+                
+                if (_thread == null)
+                {
+                    _mres = new ManualResetEventSlim();
+                    _thread = new Thread(DoJobs) {Name = "FileRecordQueue"};
+                    _thread.Start();
+                }
+                
+                _mres.Set();
             }
 
             public void AddRecord(string record)
@@ -69,7 +79,7 @@ namespace IfeelgameFramework.Core.Utils
                 }
             }
 
-            public void DoAction(Action<FileRecordQueue> action)
+            public void AddTask(Action<FileRecordQueue> action)
             {
                 lock (jobs)
                 {
@@ -77,7 +87,7 @@ namespace IfeelgameFramework.Core.Utils
                 }
             }
 
-            public void DoJobs()
+            private void DoJobs()
             {
                 Job job;
                 while (true)
@@ -88,19 +98,25 @@ namespace IfeelgameFramework.Core.Utils
                         {
                             job = jobs[0];
                             jobs.RemoveAt(0);
+                            
+                            if (!string.IsNullOrEmpty(job.record))
+                                queue.Add(job.record);
+                            else
+                            {
+                                job.action?.Invoke(queue);
+                            }
                         }
                         else
                         {
                             isDone = true;
-                            thread = null;
-                            return;
                         }
                     }
 
-                    if (!string.IsNullOrEmpty(job.record))
-                        queue.Add(job.record);
-                    else if (job.action != null)
-                        job.action(queue);
+                    if (isDone)
+                    {
+                        _mres.Reset();
+                        _mres.Wait();
+                    }
                 }
             }
         }
@@ -162,7 +178,7 @@ namespace IfeelgameFramework.Core.Utils
         }
 
         RecHeader header;
-        QueuedJob thread;
+        QueuedJob _queuedJob;
         string fileName;
         FileStream fileStream;
         byte[] stringBuf;
@@ -191,8 +207,8 @@ namespace IfeelgameFramework.Core.Utils
             if (fileStream == null)
                 throw new Exception("Cannot open file: " + fileName);
 
-            thread = new QueuedJob(this);
-            //thread.DoAction(InitRecords);
+            _queuedJob = new QueuedJob(this);
+            //_queuedJob.AddTask(InitRecords);
             InitFile();
         }
 
@@ -264,7 +280,7 @@ namespace IfeelgameFramework.Core.Utils
 
         internal void Add(string record)
         {
-            lock (thread)
+            lock (_queuedJob)
             {
                 int len = Encoding.UTF8.GetByteCount(record) + 1;
                 int n = len / header.recSize;
@@ -318,14 +334,14 @@ namespace IfeelgameFramework.Core.Utils
             if (fileStream == null)
                 throw new Exception("FileRecordQueue::WriteRecord: file not open");
 
-            int len = System.Text.Encoding.UTF8.GetByteCount(record) + 1;
+            int len = Encoding.UTF8.GetByteCount(record) + 1;
             int n = len / header.recSize;
             if (len % header.recSize > 0)
                 n++;
             if (n > header.recMax)
                 throw new Exception("FileRecordQueue::WriteRecord: record too long");
 
-            thread.AddRecord(record);
+            _queuedJob.AddRecord(record);
         }
 
         /// <summary>
@@ -346,7 +362,7 @@ namespace IfeelgameFramework.Core.Utils
                 return null;
 
             List<string> ret = new List<string>();
-            lock (thread)
+            lock (_queuedJob)
             {
                 int recfirst = header.recFirst;
                 int reccount = header.recCount;
@@ -416,7 +432,7 @@ namespace IfeelgameFramework.Core.Utils
             if (fileStream == null)
                 throw new Exception("FileRecordQueue::RemoveRecord: file not open");
 
-            lock (thread)
+            lock (_queuedJob)
             {
                 for (int i = 0; i < count; i++)
                     RemoveOne();
@@ -441,7 +457,7 @@ namespace IfeelgameFramework.Core.Utils
         /// <returns></returns>
         public int Capacity()
         {
-            lock (thread)
+            lock (_queuedJob)
             {
                 return ((int)fileStream.Length - HEADER_SIZE) / (int)header.recSize;
             }
@@ -456,7 +472,7 @@ namespace IfeelgameFramework.Core.Utils
             if (fileStream == null)
                 throw new Exception("FileRecordQueue::ClearAll: file not open");
 
-            lock (thread)
+            lock (_queuedJob)
             {
                 header.recCount = 0;
                 header.recFirst = 0;
@@ -474,13 +490,18 @@ namespace IfeelgameFramework.Core.Utils
         {
             if (fileStream != null)
             {
-                lock (thread)
+                lock (_queuedJob)
                 {
                     fileStream.Close();
                     fileStream = null;
                     File.Delete(fileName);
                 }
             }
+        }
+
+        public void AddTask(Action<FileRecordQueue> act)
+        {
+            _queuedJob.AddTask(act);
         }
     }
 }
