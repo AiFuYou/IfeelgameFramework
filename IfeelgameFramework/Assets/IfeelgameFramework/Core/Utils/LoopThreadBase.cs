@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Threading;
 using IfeelgameFramework.Core.Logger;
-using UnityEngine;
 
 namespace IfeelgameFramework.Core.Utils
 {
@@ -52,7 +51,7 @@ namespace IfeelgameFramework.Core.Utils
                     catch (Exception e)
                     {
                         DebugEx.Error("Loop failed, but continue");
-                        DebugEx.Exception(e);
+                        DebugEx.Error(e.Message);
                     }
                 }
             }
@@ -62,11 +61,11 @@ namespace IfeelgameFramework.Core.Utils
     public class Loop
     {
         private readonly List<Action> _actionQueue;
-        private readonly ManualResetEventSlim _manualResetEvent;
+        private readonly ManualResetEvent _manualResetEvent;
 
         public Loop()
         {
-            _manualResetEvent = new ManualResetEventSlim(false);
+            _manualResetEvent = new ManualResetEvent(false);
             _actionQueue = new List<Action>();
         }
 
@@ -81,7 +80,7 @@ namespace IfeelgameFramework.Core.Utils
 
         public void Prepare()
         {
-            _manualResetEvent.Wait();
+            _manualResetEvent.WaitOne();
             _manualResetEvent.Reset();
         }
 
@@ -105,7 +104,7 @@ namespace IfeelgameFramework.Core.Utils
             catch (Exception e)
             {
                 DebugEx.Error("Execute callback failed");
-                DebugEx.Exception(e);
+                DebugEx.Error(e.Message);
             }
 
             return true;

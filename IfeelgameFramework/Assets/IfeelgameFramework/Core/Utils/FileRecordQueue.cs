@@ -4,6 +4,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using IfeelgameFramework.Core.Logger;
 
 namespace IfeelgameFramework.Core.Utils
 {
@@ -51,7 +52,7 @@ namespace IfeelgameFramework.Core.Utils
                 this.queue = queue;
             }
 
-            private ManualResetEventSlim _mres = null;
+            private ManualResetEvent _mre = null;
             void AddAction(Job job)
             {
                 _isDone = false;
@@ -63,12 +64,12 @@ namespace IfeelgameFramework.Core.Utils
                 
                 if (_thread == null)
                 {
-                    _mres = new ManualResetEventSlim();
+                    _mre = new ManualResetEvent(false);
                     _thread = new Thread(DoJobs) {Name = "FileRecordQueue"};
                     _thread.Start();
                 }
                 
-                _mres.Set();
+                _mre.Set();
             }
 
             public void AddRecord(string record)
@@ -98,12 +99,19 @@ namespace IfeelgameFramework.Core.Utils
                         {
                             job = jobs[0];
                             jobs.RemoveAt(0);
-                            
-                            if (!string.IsNullOrEmpty(job.record))
-                                queue.Add(job.record);
-                            else
+
+                            try
                             {
-                                job.action?.Invoke(queue);
+                                if (!string.IsNullOrEmpty(job.record))
+                                    queue.Add(job.record);
+                                else
+                                {
+                                    job.action?.Invoke(queue);
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                DebugEx.Error(e.Message);
                             }
                         }
                         else
@@ -114,8 +122,8 @@ namespace IfeelgameFramework.Core.Utils
 
                     if (isDone)
                     {
-                        _mres.Reset();
-                        _mres.Wait();
+                        _mre.Reset();
+                        _mre.WaitOne();
                     }
                 }
             }
