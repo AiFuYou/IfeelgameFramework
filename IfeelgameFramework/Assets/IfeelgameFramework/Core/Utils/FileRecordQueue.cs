@@ -111,7 +111,7 @@ namespace IfeelgameFramework.Core.Utils
                             }
                             catch (Exception e)
                             {
-                                DebugEx.Error(e.Message);
+                                DebugEx.Error(GetType() + "\n" + e.Message);
                             }
                         }
                         else
@@ -507,6 +507,10 @@ namespace IfeelgameFramework.Core.Utils
             }
         }
 
+        /// <summary>
+        /// 添加任务
+        /// </summary>
+        /// <param name="act">任务</param>
         public void AddTask(Action<FileRecordQueue> act)
         {
             _queuedJob.AddTask(act);

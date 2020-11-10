@@ -10,8 +10,6 @@ namespace IfeelgameFramework.Core.ObjectPool
 
         public void CreateObject(GameObject prefab, int count = 1, bool worldPositionStays = false)
         {
-            
-            
             _prefabBase = prefab;
             for (var i = 0; i < count; ++i)
             {
@@ -30,10 +28,8 @@ namespace IfeelgameFramework.Core.ObjectPool
                 obj.gameObject.SetActive(true);
                 return obj;
             }
-            else
-            {
-                return Object.Instantiate(_prefabBase, null, false);
-            }
+
+            return Object.Instantiate(_prefabBase, null, false);
         }
 
         public void Put(GameObject obj)

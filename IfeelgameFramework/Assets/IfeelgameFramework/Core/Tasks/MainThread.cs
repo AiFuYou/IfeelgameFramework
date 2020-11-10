@@ -27,17 +27,16 @@ namespace IfeelgameFramework.Core.Tasks
         
             if (_mainThreadGameObject == null)
             {
-                _mainThreadGameObject = new GameObject("MainThreadGameObject");
-                _mainThreadGameObject.hideFlags = HideFlags.HideAndDontSave;
+                _mainThreadGameObject = new GameObject("MainThreadGameObject") {hideFlags = HideFlags.HideAndDontSave};
                 _taskExecutor = _mainThreadGameObject.AddComponent<MainThreadComponent>();
             
                 if (Application.isPlaying)
                 {
                     Object.DontDestroyOnLoad(_mainThreadGameObject);
                 }
+                
+                DebugEx.Log("MainThread()");
             }
-        
-            DebugEx.Log("MainThread()");
         }
     
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
@@ -68,6 +67,11 @@ namespace IfeelgameFramework.Core.Tasks
         public static void AddTaskToLateUpdate(Action act)
         {
             _taskExecutor.AddTaskToLateUpdate(new ActionRunner(act));
+        }
+
+        public static void AddTaskToFixedUpdate(Action act)
+        {
+            _taskExecutor.AddTaskToFixedUpdate(new ActionRunner(act));
         }
 
         private static bool IsMainThread()

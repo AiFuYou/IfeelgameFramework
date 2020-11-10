@@ -6,16 +6,18 @@ namespace IfeelgameFramework.Core.Utils
 {
     public class NativeBridge
     {
+#if !UNITY_EDITOR && UNITY_ANDROID
         private AndroidJavaClass _pluginAndroid = null;
+#endif
         private static NativeBridge _instance;
-        private static Object _padlock = new Object();
+        private static readonly Object InstanceLock = new Object();
 
         private NativeBridge() {}
         public static NativeBridge Instance
         {
             get
             {
-                lock (_padlock)
+                lock (InstanceLock)
                 {
                     return _instance ?? (_instance = new NativeBridge());
                 }     
