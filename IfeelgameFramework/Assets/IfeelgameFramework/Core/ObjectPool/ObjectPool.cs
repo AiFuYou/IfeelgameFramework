@@ -1,53 +1,44 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
 
 namespace IfeelgameFramework.Core.ObjectPool
 {
-    public class ObjectPool
+    public class ObjectPool<T> where T : new()
     {
-        private GameObject _prefabBase;
-        private readonly List<GameObject> _list = new List<GameObject>();
+        private readonly Stack<T> _objectStack = new Stack<T>();
 
-        public void CreateObject(GameObject prefab, int count = 1, bool worldPositionStays = false)
+        public virtual T Get()
         {
-            _prefabBase = prefab;
-            for (var i = 0; i < count; ++i)
+            lock (_objectStack)
             {
-                var obj = Object.Instantiate(prefab, null, worldPositionStays);
-                obj.gameObject.SetActive(false);
-                _list.Add(obj);
+                return Count > 0 ? _objectStack.Pop() : new T();
             }
         }
 
-        public GameObject Get()
+        public virtual void Put(T obj)
         {
-            if (_list.Count > 0)
+            lock (_objectStack)
             {
-                var obj = _list[0];
-                _list.RemoveAt(0);
-                obj.gameObject.SetActive(true);
-                return obj;
+                _objectStack.Push(obj);
             }
-
-            return Object.Instantiate(_prefabBase, null, false);
         }
 
-        public void Put(GameObject obj)
+        public virtual void Clear()
         {
-            obj.transform.SetParent(null);
-            obj.gameObject.SetActive(false);
-            _list.Add(obj);
+            lock (_objectStack)
+            {
+                _objectStack.Clear();
+            }
         }
 
-        public bool HaveObjectBase()
+        public int Count
         {
-            return _prefabBase != null;
-        }
-
-        public void Clear()
-        {
-            _prefabBase = null;
-            _list.Clear();
+            get
+            {
+                lock (_objectStack)
+                {
+                    return _objectStack.Count;
+                }
+            }
         }
     }
 }

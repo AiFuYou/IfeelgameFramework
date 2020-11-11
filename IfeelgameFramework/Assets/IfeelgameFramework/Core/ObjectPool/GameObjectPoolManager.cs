@@ -4,20 +4,20 @@ using UnityEngine;
 
 namespace IfeelgameFramework.Core.ObjectPool
 {
-    public class ObjectPoolManager
+    public class GameObjectPoolManager
     {
-        private readonly Dictionary<string, ObjectPool> _objectPoolDict = new Dictionary<string, ObjectPool>();
-        private static ObjectPoolManager _instance;
+        private readonly Dictionary<string, GameObjectPool> _objectPoolDict = new Dictionary<string, GameObjectPool>();
+        private static GameObjectPoolManager _instance;
         private static readonly Object LockPad = new Object();
         private readonly Dictionary<GameObject, string> _usingGameObjects = new Dictionary<GameObject, string>();
 
-        public static ObjectPoolManager Instance
+        public static GameObjectPoolManager Instance
         {
             get
             {
                 lock (LockPad)
                 {
-                    return _instance ?? (_instance = new ObjectPoolManager());
+                    return _instance ?? (_instance = new GameObjectPoolManager());
                 }
             }
         }
@@ -26,8 +26,7 @@ namespace IfeelgameFramework.Core.ObjectPool
         {
             if (!_objectPoolDict.ContainsKey(poolName))
             {
-                var tmpPool = new ObjectPool();
-                tmpPool.CreateObject(gObj, count);
+                var tmpPool = new GameObjectPool(gObj, count);
                 _objectPoolDict.Add(poolName, tmpPool);
             }
             else
@@ -92,6 +91,15 @@ namespace IfeelgameFramework.Core.ObjectPool
             foreach (var op in _objectPoolDict)
             {
                 op.Value.Clear();
+            }
+        }
+
+        public void DelGameObjectPool(string poolName)
+        {
+            if (_objectPoolDict.ContainsKey(poolName))
+            {
+                Clear(poolName);
+                _objectPoolDict.Remove(poolName);
             }
         }
     }

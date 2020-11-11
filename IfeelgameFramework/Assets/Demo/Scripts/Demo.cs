@@ -16,7 +16,7 @@ public class Demo : MonoBehaviour
     void Start()
     {
         // SoundManagerTest();
-        // GameObjectPoolTest();
+        GameObjectPoolTest();
         // WriteRecordTest();
         // GetIpTest();
         // LocalStorageTest();
@@ -127,8 +127,31 @@ public class Demo : MonoBehaviour
     private void GameObjectPoolTest()
     {
         var gObj = new GameObject("12312");
-        ObjectPoolManager.Instance.Add("test", gObj);
-        ObjectPoolManager.Instance.Add("test", gObj);
+        GameObjectPoolManager.Instance.Add("test", gObj);
+
+        for (var i = 0; i < 10; i++)
+        {
+            var go = GameObjectPoolManager.Instance.Get("test");
+            go.transform.SetParent(gameObject.transform);
+            go.transform.localPosition = Vector2.zero;
+            go.name = i.ToString();
+            GameObjectPoolManager.Instance.Put(go);
+        }
+
+        var dictStrStrPool = new DictStrStrPool();
+        for (var i = 0; i < 10; i++)
+        {
+            var a = dictStrStrPool.Get();
+            a.Add("test", "test");
+            dictStrStrPool.Put(a);
+
+            var b = dictStrStrPool.Get();
+            dictStrStrPool.Put(b);
+        }
+        
+        DebugEx.Log(dictStrStrPool.Count);
+        dictStrStrPool.Clear();
+        DebugEx.Log(dictStrStrPool.Count);
     }
     
     #endregion
