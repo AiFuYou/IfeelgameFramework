@@ -7,21 +7,28 @@ using UnityEngine;
 
 namespace IfeelgameFramework.Core.Utils
 {
-    public class Tools
+    public static class Tools
     {
         #region 异步线程获取当前网络ip
         
         /// <summary>
         /// 异步线程获取当前网络ip，访问http://ip-api.com查看文档可以获取更多当前网络参数
         /// </summary>
+        /// <param name="needWait">是否等待ip返回，默认等待</param>
         /// <returns>当前网络ip地址</returns>
-        public static string GetIp()
+        public static async Task<string> GetIpAsync(bool needWait = true)
         {
             if (string.IsNullOrEmpty(_ip))
             {
-                QueryIp();
+                if (needWait)
+                {
+                    await QueryIp(true);
+                }
+                else
+                {
+                    QueryIp(false);
+                }
             }
-
             return _ip;
         }
 
@@ -29,9 +36,15 @@ namespace IfeelgameFramework.Core.Utils
         private static HttpClient _clientIp;
         private static HttpResponseMessage _responseIp;
         private static bool _ipIsQuerying;
-        private static void QueryIp()
+        private static Task _queryIpTask;
+        private static async Task QueryIp(bool needWait)
         {
-            if (_ipIsQuerying) return;
+            if (_ipIsQuerying)
+            {
+                await _queryIpTask;
+                return;
+            }
+            
             if (!string.IsNullOrEmpty(_ip)) return;
             if (Application.internetReachability == NetworkReachability.NotReachable)
             {
@@ -40,7 +53,7 @@ namespace IfeelgameFramework.Core.Utils
             }
             
             _ipIsQuerying = true;
-            Task.Run(async () =>
+            _queryIpTask = Task.Run(async () =>
             {
                 try
                 {
@@ -79,6 +92,11 @@ namespace IfeelgameFramework.Core.Utils
                     _ipIsQuerying = false;
                 }
             });
+
+            if (needWait)
+            {
+                await _queryIpTask;
+            }
         }
         
         #endregion

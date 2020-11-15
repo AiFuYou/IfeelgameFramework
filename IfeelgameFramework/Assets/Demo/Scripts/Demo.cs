@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
 using IfeelgameFramework.Core.ObjectPool;
@@ -16,7 +17,7 @@ public class Demo : MonoBehaviour
     void Start()
     {
         // SoundManagerTest();
-        GameObjectPoolTest();
+        // ObjectPoolTest();
         // WriteRecordTest();
         // GetIpTest();
         // LocalStorageTest();
@@ -115,9 +116,13 @@ public class Demo : MonoBehaviour
 
     private async void GetIpTest()
     {
-        DebugEx.Log(Tools.GetIp());
-        await Task.Delay(1000);
-        DebugEx.Log(Tools.GetIp());
+        DebugEx.Log(await Tools.GetIpAsync(false));
+
+        var ip2 = await Tools.GetIpAsync();
+        DebugEx.Log(ip2);
+        
+        DebugEx.Log(await Tools.GetIpAsync(false));
+        DebugEx.Log(await Tools.GetIpAsync());
     }
     
     #endregion
@@ -127,22 +132,32 @@ public class Demo : MonoBehaviour
     private void GameObjectPoolTest()
     {
         var gObj = new GameObject("12312");
-        GameObjectPoolManager.Instance.Add("test", gObj);
-
+        var testGObjPool = ObjectPoolManager.Instance.Create<GameObject>("test", () => Instantiate(gObj), Destroy);
+        
         for (var i = 0; i < 10; i++)
         {
-            var go = GameObjectPoolManager.Instance.Get("test");
+            var go = ObjectPoolManager.Instance.Get<GameObject>("test");
             go.transform.SetParent(gameObject.transform);
             go.transform.localPosition = Vector2.zero;
             go.name = i.ToString();
-            GameObjectPoolManager.Instance.Put(go);
+            ObjectPoolManager.Instance.Put<GameObject>("test", go);
         }
 
-        var dictStrStrPool = new DictStrStrPool();
+        for (int i = 0; i < 100; i++)
+        {
+            var go = testGObjPool.Get();
+            go.transform.SetParent(gameObject.transform);
+            go.transform.localPosition = Vector2.zero;
+            go.name = i.ToString();
+            testGObjPool.Put(go);
+        }
+
+        ObjectPoolManager.Instance.Create<Dictionary<string, string>>("DictStrStr", () => new Dictionary<string, string>(), (a) => a.Clear());
+        var dictStrStrPool = ObjectPoolManager.Instance.GetPool<Dictionary<string, string>>("DictStrStr");
         for (var i = 0; i < 10; i++)
         {
             var a = dictStrStrPool.Get();
-            a.Add("test", "test");
+            a.Add("test" + i, "test" + i);
             dictStrStrPool.Put(a);
 
             var b = dictStrStrPool.Get();
@@ -175,11 +190,4 @@ public class Demo : MonoBehaviour
     }
     
     #endregion
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }

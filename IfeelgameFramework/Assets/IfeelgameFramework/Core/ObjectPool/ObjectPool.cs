@@ -1,43 +1,65 @@
-﻿using System.Collections.Generic;
+﻿/*
+ * 使用此类及其衍生类时注意
+ */
+
+using System;
+using System.Collections.Concurrent;
 
 namespace IfeelgameFramework.Core.ObjectPool
 {
-    public class ObjectPool<T> where T : new()
+    public sealed class ObjectPool<T> : IObjectPool
     {
-        private readonly Stack<T> _objectStack = new Stack<T>();
+        private readonly ConcurrentBag<T> _objects;
+        private readonly Func<T> _objectGenerator;
+        private readonly Action<T> _objectRelease;
+        private int _capacity;
 
-        public virtual T Get()
+        public ObjectPool(Func<T> objectGenerator, Action<T> objectRelease, int capacity = 5)
         {
-            lock (_objectStack)
+            _objectGenerator = objectGenerator ?? throw new ArgumentNullException(nameof(objectGenerator));
+            _objectRelease = objectRelease ?? throw new ArgumentNullException(nameof(objectRelease));
+            _capacity = capacity;
+            _objects = new ConcurrentBag<T>();
+        }
+
+        public T Get() => _objects.TryTake(out T item) ? item : _objectGenerator();
+
+        public void Put(T item)
+        {
+            if (Count < _capacity)
             {
-                return Count > 0 ? _objectStack.Pop() : new T();
+                _objects.Add(item);
+            }
+            else
+            {
+                _objectRelease(item);
             }
         }
 
-        public virtual void Put(T obj)
-        {
-            lock (_objectStack)
-            {
-                _objectStack.Push(obj);
-            }
-        }
+        public int Count => _objects.Count;
 
-        public virtual void Clear()
+        public void SetCapacity(int capacity)
         {
-            lock (_objectStack)
+            _capacity = capacity;
+            
+            if (Count > _capacity)
             {
-                _objectStack.Clear();
-            }
-        }
-
-        public int Count
-        {
-            get
-            {
-                lock (_objectStack)
+                T _;
+                while (Count > _capacity)
                 {
-                    return _objectStack.Count;
+                    _objects.TryTake(out _);
+                    _objectRelease(_);
                 }
+            }
+        }
+
+        public void Clear()
+        {
+            T _;
+            while (!_objects.IsEmpty) 
+            {
+                _objects.TryTake(out _);
+                _objectRelease(_);
             }
         }
     }
