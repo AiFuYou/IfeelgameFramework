@@ -112,7 +112,7 @@ namespace IfeelgameFramework.Core.Storage
         }
 
         /// <summary>
-        /// 存储默认文件内容
+        /// 写入磁盘
         /// </summary>
         /// <param name="saveAll">是否所有存储写入磁盘</param>
         public void Save(bool saveAll = false)
@@ -125,6 +125,23 @@ namespace IfeelgameFramework.Core.Storage
                 {
                     item.Value.Save();
                 }
+            }
+        }
+
+        /// <summary>
+        /// 异步线程写入磁盘
+        /// </summary>
+        /// <param name="saveAll">是否所有存储写入磁盘</param>
+        public void SaveAsync(bool saveAll = false)
+        {
+            _defaultLocalStorage?.SaveAsync();
+            
+            if (saveAll)
+            {
+                foreach (var item in _localStorages)
+                {
+                    item.Value.SaveAsync();
+                }    
             }
         }
     }

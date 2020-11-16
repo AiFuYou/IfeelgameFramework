@@ -80,14 +80,7 @@ namespace IfeelgameFramework.Core.Storage
             {
                 if (_data.TryGetValue(k, out var v))
                 {
-                    if (typeof(T).IsValueType)
-                    {
-                        return (T)Convert.ChangeType(v, typeof(T));
-                    }
-                    else
-                    {
-                        return JsonConvert.DeserializeObject<T>((string) v);
-                    }
+                    return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(v));
                 }
                 return default;
             }
@@ -131,7 +124,7 @@ namespace IfeelgameFramework.Core.Storage
         }
 
         /// <summary>
-        /// 将数据写入磁盘
+        /// 同步方法将数据写入磁盘
         /// </summary>
         public void Save()
         {

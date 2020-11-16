@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
 using IfeelgameFramework.Core.ObjectPool;
@@ -20,11 +19,8 @@ public class Demo : MonoBehaviour
         // ObjectPoolTest();
         // WriteRecordTest();
         // GetIpTest();
-        // LocalStorageTest();
+        LocalStorageTest();
         // TaskTest();
-        
-        // DebugEx.Log(TAG, SystemInfo.operatingSystem);
-        // DebugEx.Log(TAG, SystemInfo.operatingSystemFamily);
     }
 
     #region MainThreadTaskTest
@@ -80,22 +76,22 @@ public class Demo : MonoBehaviour
         var ls = LocalStorageManager.Instance.GetLocalStorage("test");
         // var ls = LocalStorageManager.Instance;
 
-        ls.SetValue("short", (short)1, true);
-        ls.SetValue("int", 1, true, true);
-        ls.SetValue("float", 1.1f, true);
-        ls.SetValue("long", (long)1, true, true);
-        ls.SetValue("bool", false, true);
-        ls.SetValue("string", "1231231", true, true);
-        ls.SetValue("double", 22.2, true);
-
-        var myClass = new MyClass();
-        myClass.a = 3;
-
-        var dic = new Dictionary<string, int> {{"s", 1}};
-        myClass.e.Add(dic);
-        myClass.d.Add("a", false);
-        
-        ls.SetValue("test", myClass, true);
+        // ls.SetValue("short", (short)1, true);
+        // ls.SetValue("int", 1, true, true);
+        // ls.SetValue("float", 1.1f, true);
+        // ls.SetValue("long", (long)1, true, true);
+        // ls.SetValue("bool", false, true);
+        // ls.SetValue("string", "1231231", true, true);
+        // ls.SetValue("double", 22.2, true);
+        //
+        // var myClass = new MyClass();
+        // myClass.a = 3;
+        //
+        // var dic = new Dictionary<string, int> {{"s", 1}};
+        // myClass.e.Add(dic);
+        // myClass.d.Add("a", false);
+        //
+        // ls.SetValue("test", myClass, true);
 
         var b1 = ls.GetValue<short>("short");
         var b2 = ls.GetValue<int>("int");
@@ -116,8 +112,10 @@ public class Demo : MonoBehaviour
 
     private async void GetIpTest()
     {
+        //传入false，不等待结果返回
         DebugEx.Log(await Tools.GetIpAsync(false));
 
+        //默认传入true，等待网络结果返回
         var ip2 = await Tools.GetIpAsync();
         DebugEx.Log(ip2);
         
