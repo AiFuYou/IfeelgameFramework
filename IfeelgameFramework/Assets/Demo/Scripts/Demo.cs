@@ -19,7 +19,7 @@ public class Demo : MonoBehaviour
         // ObjectPoolTest();
         // WriteRecordTest();
         // GetIpTest();
-        LocalStorageTest();
+        // LocalStorageTest();
         // TaskTest();
     }
 
@@ -76,22 +76,22 @@ public class Demo : MonoBehaviour
         var ls = LocalStorageManager.Instance.GetLocalStorage("test");
         // var ls = LocalStorageManager.Instance;
 
-        // ls.SetValue("short", (short)1, true);
-        // ls.SetValue("int", 1, true, true);
-        // ls.SetValue("float", 1.1f, true);
-        // ls.SetValue("long", (long)1, true, true);
-        // ls.SetValue("bool", false, true);
-        // ls.SetValue("string", "1231231", true, true);
-        // ls.SetValue("double", 22.2, true);
-        //
-        // var myClass = new MyClass();
-        // myClass.a = 3;
-        //
-        // var dic = new Dictionary<string, int> {{"s", 1}};
-        // myClass.e.Add(dic);
-        // myClass.d.Add("a", false);
-        //
-        // ls.SetValue("test", myClass, true);
+        ls.SetValue("short", (short)1, true);
+        ls.SetValue("int", 1, true, true);
+        ls.SetValue("float", 1.1f, true);
+        ls.SetValue("long", (long)1, true, true);
+        ls.SetValue("bool", false, true);
+        ls.SetValue("string", "1231231", true, true);
+        ls.SetValue("double", 22.2, true);
+        
+        var myClass = new MyClass();
+        myClass.a = 3;
+        
+        var dic = new Dictionary<string, int> {{"s", 1}};
+        myClass.e.Add(dic);
+        myClass.d.Add("a", false);
+        
+        ls.SetValue("test", myClass, true);
 
         var b1 = ls.GetValue<short>("short");
         var b2 = ls.GetValue<int>("int");

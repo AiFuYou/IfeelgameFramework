@@ -12,7 +12,7 @@ namespace IfeelgameFramework.Core.Storage
     /// <summary>
     /// 数据存储类
     /// </summary>
-    public class LocalStorage
+    public class LocalStorage : IDisposable
     {
         private Dictionary<string, object> _data;
         private string _dataStr;
@@ -20,16 +20,13 @@ namespace IfeelgameFramework.Core.Storage
         private readonly ReaderWriterLockSlim _rwLocks = new ReaderWriterLockSlim();
         private readonly object _saveLock = new object();
         private bool _isDirty;
+        private IEncrypt _encryptor;
     
-        public LocalStorage(string fileName)
+        public LocalStorage(string fileName, IEncrypt encryptor)
         {
             _fileName = fileName;
+            _encryptor = encryptor;
             InitGameData();
-        }
-    
-        ~LocalStorage()
-        {
-            _rwLocks.Dispose();
         }
 
         /// <summary>
@@ -46,8 +43,10 @@ namespace IfeelgameFramework.Core.Storage
                     {
                         try
                         {
-                            dataBytes = new byte[fs.Length];
-                            fs.Read(dataBytes, 0, (int)fs.Length);
+                            var bytes = new byte[fs.Length];
+                            fs.Read(bytes, 0, (int)fs.Length);
+
+                            dataBytes = Encoding.UTF8.GetBytes(_encryptor.Decode(Encoding.UTF8.GetString(bytes)));
                         }
                         catch (Exception e)
                         {
@@ -161,7 +160,7 @@ namespace IfeelgameFramework.Core.Storage
                             _rwLocks.ExitReadLock();
                         }
 
-                        var bytes = Encoding.UTF8.GetBytes(_dataStr);
+                        var bytes = Encoding.UTF8.GetBytes(_encryptor.Encode(_dataStr));
                         fs.Write(bytes, 0, bytes.Length);
                         fs.Flush();
                     }
@@ -171,6 +170,35 @@ namespace IfeelgameFramework.Core.Storage
                     }
                 }
             }
+        }
+        
+        ~LocalStorage()
+        {
+            Dispose(false);
+        }
+
+        private bool _disposed;
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            if (_disposed)
+            {
+                return;
+            }
+
+            if (disposing)
+            {
+                _data.Clear();
+            }
+            
+            _rwLocks.Dispose();
+
+            _disposed = true;
         }
     }
 }

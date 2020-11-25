@@ -13,6 +13,7 @@ namespace IfeelgameFramework.Core.Storage
         private Dictionary<string, LocalStorage> _localStorages = null;
         private LocalStorage _defaultLocalStorage = null;
         private readonly object _dLock = new object();
+        private readonly DefaultEncrypt _encryptor = new DefaultEncrypt();
         private LocalStorage DefaultLocalStorage
         {
             get
@@ -21,7 +22,7 @@ namespace IfeelgameFramework.Core.Storage
                 {
                     if (_defaultLocalStorage == null)
                     {
-                        _defaultLocalStorage = new LocalStorage(Path.Combine(FilePath, "gameDefault.dat"));
+                        _defaultLocalStorage = new LocalStorage(Path.Combine(FilePath, "gameDefault.dat"), _encryptor);
                     }
                 }
                 return _defaultLocalStorage;
@@ -69,7 +70,7 @@ namespace IfeelgameFramework.Core.Storage
         /// <returns>存储对象</returns>
         public LocalStorage GetLocalStorage(string fileName, bool cache = false)
         {
-            var ls = new LocalStorage(Path.Combine(FilePath, fileName));
+            var ls = new LocalStorage(Path.Combine(FilePath, fileName), _encryptor);
             if (cache && !_localStorages.ContainsKey(fileName))
             {
                 _localStorages[fileName] = ls;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Net.Http;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
@@ -9,8 +10,8 @@ namespace IfeelgameFramework.Core.Utils
 {
     public static class Tools
     {
-        #region 异步线程获取当前网络ip
-        
+        #region 异步线程获取当前网络ip相关信息
+
         /// <summary>
         /// 异步线程获取当前网络ip，访问http://ip-api.com查看文档可以获取更多当前网络参数
         /// </summary>
@@ -26,7 +27,9 @@ namespace IfeelgameFramework.Core.Utils
                 }
                 else
                 {
+                    #pragma warning disable 4014
                     QueryIp(false);
+                    #pragma warning restore 4014
                 }
             }
             return _ip;
@@ -97,6 +100,46 @@ namespace IfeelgameFramework.Core.Utils
             {
                 await _queryIpTask;
             }
+        }
+        
+        #endregion
+
+        #region Wait,Delay,仅限在协程里调用
+
+        /// <summary>
+        /// 等待一定时间后执行action
+        /// </summary>
+        /// <param name="action">方法</param>
+        /// <param name="time">等待时间</param>
+        /// <returns></returns>
+        public static IEnumerator Run(Action action, float time)
+        {
+            yield return new WaitForSeconds(time);
+            action();
+        }
+
+        /// <summary>
+        /// 满足condition时执行action
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="action">方法</param>
+        /// <returns></returns>
+        public static IEnumerator WaitUntil(Func<bool> condition, Action action)
+        {
+            yield return new WaitUntil(condition);
+            action();
+        }
+
+        /// <summary>
+        /// 不满足condition时执行action
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="action">方法</param>
+        /// <returns></returns>
+        public static IEnumerator WaitWhile(Func<bool> condition, Action action)
+        {
+            yield return new WaitWhile(condition);
+            action();
         }
         
         #endregion
