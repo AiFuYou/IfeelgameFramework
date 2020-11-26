@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
+using IfeelgameFramework.Core.Messenger;
 using IfeelgameFramework.Core.ObjectPool;
 using IfeelgameFramework.Core.Sound;
 using IfeelgameFramework.Core.Storage;
@@ -21,7 +22,19 @@ public class Demo : MonoBehaviour
         // GetIpTest();
         // LocalStorageTest();
         // TaskTest();
+        // MessengerTest();
     }
+
+    #region MessengerTest
+
+    private void MessengerTest()
+    {
+        Messenger.Instance.AddListener("test", LocalStorageTest);
+        Messenger.Instance.BroadCast("test");
+        Messenger.Instance.RemoveListener("test", LocalStorageTest);
+    }
+
+    #endregion
 
     #region MainThreadTaskTest
 
