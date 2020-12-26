@@ -21,7 +21,11 @@ char* toUnityStr(const char* str)
 
 extern "C" {    
     const char* mGetRegionName(){
-        return toUnityStr([[NativeAPI Instance] GetRegionName]);
+        return toUnityStr([[[NativeAPI Instance] GetRegionName] UTF8String]);
+    }
+    
+    const char* mGetUUID(){
+        return toUnityStr([[[NativeAPI Instance] GetUUID] UTF8String]);
     }
 }
 

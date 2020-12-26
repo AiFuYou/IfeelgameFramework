@@ -12,7 +12,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.v("MainActivity", "测试");
+        Log.v("MainActivity", "test");
         Log.v("MainActivity", NativeUnityPlugin.GetRegionName());
+
+        NativeUnityPlugin.Init(this);
+        Log.v("MainActivity", NativeUnityPlugin.GetAndroidId());
     }
 }

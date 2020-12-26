@@ -1,1 +1,1 @@
--keep class com.ifeel.game.framework.* {*;}
+-keep class com.ifeel.game.framework.NativeUnityPlugin {*;}

@@ -20,4 +20,4 @@
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
 
--keep class com.ifeel.game.framework.* {*;}
+-keep class com.ifeel.game.framework.NativeUnityPlugin {*;}

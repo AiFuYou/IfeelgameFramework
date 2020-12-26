@@ -12,6 +12,8 @@
 		0A20D02424F80541002595A7 /* NativeAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 0A20D02324F80541002595A7 /* NativeAPI.m */; };
 		0A20D02624F8058C002595A7 /* NativeUnityPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0A20D02524F8058C002595A7 /* NativeUnityPlugin.mm */; };
 		0A20D02924F80D50002595A7 /* NativeUnityPlugin.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A20D02724F805A1002595A7 /* NativeUnityPlugin.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		D5B2B8A02597315800104B20 /* BCCKeychain.h in Headers */ = {isa = PBXBuildFile; fileRef = D5B2B89E2597315700104B20 /* BCCKeychain.h */; };
+		D5B2B8A12597315800104B20 /* BCCKeychain.m in Sources */ = {isa = PBXBuildFile; fileRef = D5B2B89F2597315700104B20 /* BCCKeychain.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -22,6 +24,8 @@
 		0A20D02324F80541002595A7 /* NativeAPI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeAPI.m; sourceTree = "<group>"; };
 		0A20D02524F8058C002595A7 /* NativeUnityPlugin.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = NativeUnityPlugin.mm; sourceTree = "<group>"; };
 		0A20D02724F805A1002595A7 /* NativeUnityPlugin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeUnityPlugin.h; sourceTree = "<group>"; };
+		D5B2B89E2597315700104B20 /* BCCKeychain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BCCKeychain.h; sourceTree = "<group>"; };
+		D5B2B89F2597315700104B20 /* BCCKeychain.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BCCKeychain.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -54,6 +58,7 @@
 		0A20D01824F804F4002595A7 /* Ifeelgame */ = {
 			isa = PBXGroup;
 			children = (
+				D5B2B89D2597315700104B20 /* BCCKeychain */,
 				0A20D01924F804F4002595A7 /* Ifeelgame.h */,
 				0A20D01A24F804F4002595A7 /* Info.plist */,
 				0A20D02124F8052E002595A7 /* NativeAPI.h */,
@@ -62,6 +67,15 @@
 				0A20D02724F805A1002595A7 /* NativeUnityPlugin.h */,
 			);
 			path = Ifeelgame;
+			sourceTree = "<group>";
+		};
+		D5B2B89D2597315700104B20 /* BCCKeychain */ = {
+			isa = PBXGroup;
+			children = (
+				D5B2B89E2597315700104B20 /* BCCKeychain.h */,
+				D5B2B89F2597315700104B20 /* BCCKeychain.m */,
+			);
+			path = BCCKeychain;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,6 +88,7 @@
 				0A20D02924F80D50002595A7 /* NativeUnityPlugin.h in Headers */,
 				0A20D02224F8052E002595A7 /* NativeAPI.h in Headers */,
 				0A20D01B24F804F4002595A7 /* Ifeelgame.h in Headers */,
+				D5B2B8A02597315800104B20 /* BCCKeychain.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -147,6 +162,7 @@
 			files = (
 				0A20D02424F80541002595A7 /* NativeAPI.m in Sources */,
 				0A20D02624F8058C002595A7 /* NativeUnityPlugin.mm in Sources */,
+				D5B2B8A12597315800104B20 /* BCCKeychain.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

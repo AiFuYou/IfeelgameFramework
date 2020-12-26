@@ -12,7 +12,8 @@
 @interface NativeAPI : NSObject
 
 +(NativeAPI*) Instance;
--(const char*) GetRegionName;
+- (NSString*) GetRegionName;
+- (NSString*) GetUUID;
 
 @end
 

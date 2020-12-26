@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "NativeAPI.h"
+#import "BCCKeychain/BCCKeychain.h"
 
 @implementation NativeAPI
 
@@ -27,10 +28,28 @@ static NativeAPI *_instance = nil;
     return self;
 }
 
--(const char*) GetRegionName{
+-(NSString*) GetRegionName{
     NSLocale *currentLocale = [NSLocale currentLocale];
     NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode];
-    return [[countryCode uppercaseString] UTF8String];
+    return [countryCode uppercaseString];
+}
+
+- (NSString*) GetUUID{
+    NSString* userName = @"UUID";
+    NSString* serviceName = [[NSBundle mainBundle]bundleIdentifier];
+    
+    NSString* uuid = [BCCKeychain getPasswordStringForUsername:userName andServiceName:serviceName error:nil];
+    if (uuid == nil){
+        uuid = [[NSUUID UUID] UUIDString];
+        
+        int retryCount = 0;
+        int maxRetryCount = 3;
+        while (![BCCKeychain storeUsername:userName andPasswordString:uuid forServiceName:serviceName updateExisting:false error:nil] && retryCount < maxRetryCount) {
+            ++retryCount;
+        }
+    }
+    
+    return uuid;
 }
 
 @end
