@@ -23,6 +23,7 @@ public class Demo : MonoBehaviour
         // LocalStorageTest();
         // TaskTest();
         // MessengerTest();
+        // NativeBridgeTest();
     }
 
     #region MessengerTest
@@ -201,4 +202,20 @@ public class Demo : MonoBehaviour
     }
     
     #endregion
+
+    #region NativeBridgeTest
+
+    private void NativeBridgeTest()
+    {
+#if UNITY_ANDROID
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetAndroidId());
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetRegionName());
+#elif UNITY_IOS
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetUUID());
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetRegionName());
+#endif
+    }
+
+    #endregion
+     
 }
