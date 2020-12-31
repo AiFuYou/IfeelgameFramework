@@ -24,6 +24,10 @@ extern "C" {
         return toUnityStr([[[NativeAPI Instance] GetRegionName] UTF8String]);
     }
     
+    const char* mGetLanguage(){
+        return toUnityStr([[[NativeAPI Instance] GetLanguage] UTF8String]);
+    }
+    
     const char* mGetUUID(){
         return toUnityStr([[[NativeAPI Instance] GetUUID] UTF8String]);
     }

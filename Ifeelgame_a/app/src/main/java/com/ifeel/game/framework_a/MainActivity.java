@@ -14,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         Log.v("MainActivity", "test");
         Log.v("MainActivity", NativeUnityPlugin.GetRegionName());
+        Log.v("MainActivity", NativeUnityPlugin.GetLanguage());
 
         NativeUnityPlugin.Init(this);
         Log.v("MainActivity", NativeUnityPlugin.GetAndroidId());

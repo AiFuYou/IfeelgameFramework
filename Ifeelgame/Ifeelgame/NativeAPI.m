@@ -14,7 +14,7 @@
 
 static NativeAPI *_instance = nil;
 
-+(NativeAPI*) Instance{
++ (NativeAPI*) Instance{
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         NSLog(@"Creating NativeAPI Instance");
@@ -23,15 +23,17 @@ static NativeAPI *_instance = nil;
     return _instance;
 }
 
--(id)init {
+- (id)init {
     self = [super init];
     return self;
 }
 
--(NSString*) GetRegionName{
-    NSLocale *currentLocale = [NSLocale currentLocale];
-    NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode];
-    return [countryCode uppercaseString];
+- (NSString*) GetRegionName{
+    return [[[NSLocale currentLocale] objectForKey:NSLocaleCountryCode] uppercaseString];
+}
+
+- (NSString*) GetLanguage{
+    return [[[NSLocale currentLocale] objectForKey:NSLocaleLanguageCode] lowercaseString];
 }
 
 - (NSString*) GetUUID{

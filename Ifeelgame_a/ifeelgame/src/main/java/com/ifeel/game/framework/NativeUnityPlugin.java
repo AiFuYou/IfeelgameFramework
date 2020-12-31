@@ -11,6 +11,10 @@ public class NativeUnityPlugin {
         return NativeAPI.Instance().GetRegionName();
     }
 
+    public static String GetLanguage(){
+        return NativeAPI.Instance().GetLanguage();
+    }
+
     public static String GetAndroidId(){
         return NativeAPI.Instance().GetAndroidId();
     }

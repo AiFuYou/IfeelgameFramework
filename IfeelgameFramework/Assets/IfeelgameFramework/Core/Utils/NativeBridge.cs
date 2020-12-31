@@ -54,6 +54,26 @@ namespace IfeelgameFramework.Core.Utils
 
         #endregion
 
+        #region Language
+
+#if !UNITY_EDITOR && UNITY_IOS 
+        [DllImport("__Internal")]
+        private static extern string mGetLanguage();
+#endif
+
+        public string GetLanguage()
+        {
+            var language = Application.systemLanguage.ToString(); 
+#if !UNITY_EDITOR && UNITY_ANDROID
+            language = _pluginAndroid.CallStatic<string>("GetLanguage");
+#elif !UNITY_EDITOR && UNITY_IOS
+            language = mGetLanguage();
+#endif
+            return language;
+        }
+
+        #endregion
+
         #region UniqueId
 
         public string GetAndroidId()

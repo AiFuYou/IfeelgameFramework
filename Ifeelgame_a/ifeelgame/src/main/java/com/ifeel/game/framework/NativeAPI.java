@@ -31,6 +31,10 @@ public class NativeAPI {
         return Locale.getDefault().getCountry().trim().toUpperCase();
     }
 
+    public String GetLanguage(){
+        return Locale.getDefault().getLanguage().toLowerCase();
+    }
+
     public String GetAndroidId(){
         if (_context == null){
             Log.v("NativeAPI GetAndroidId", "NativeAPI not init，can not get ANDROID_ID");
