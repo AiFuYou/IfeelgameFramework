@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
 using IfeelgameFramework.Core.Logger;
-using UnityEngine;
 
-namespace IfeelgameFramework.Core.Tasks
+namespace IfeelgameFramework.Core.MainThreadTasks
 {
     internal class ActionRunner
     {

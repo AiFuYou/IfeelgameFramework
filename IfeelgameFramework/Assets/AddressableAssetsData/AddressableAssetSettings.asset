@@ -17,6 +17,7 @@ MonoBehaviour:
   m_BundleLocalCatalog: 0
   m_DisableCatalogUpdateOnStart: 0
   m_UniqueBundleIds: 0
+  m_ContiguousBundles: 0
   m_RemoteCatalogBuildPath:
     m_Id: 
   m_RemoteCatalogLoadPath:
@@ -25,6 +26,7 @@ MonoBehaviour:
   m_GroupAssets:
   - {fileID: 11400000, guid: d17507337dda7432badddc89020feb11, type: 2}
   - {fileID: 11400000, guid: 09ad4b4240043421fb2056adcdedfc9c, type: 2}
+  - {fileID: 11400000, guid: f535d44cf63d7469ba1f10fb96aa63fb, type: 2}
   m_BuildSettings:
     m_CompileScriptsInVirtualMode: 0
     m_CleanupStreamingAssetsAfterBuilds: 1

@@ -1,11 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
+using IfeelgameFramework.Core.MainThreadTasks;
 using IfeelgameFramework.Core.Messenger;
 using IfeelgameFramework.Core.ObjectPool;
-using IfeelgameFramework.Core.Sound;
 using IfeelgameFramework.Core.Storage;
-using IfeelgameFramework.Core.Tasks;
 using IfeelgameFramework.Core.Utils;
 using UnityEngine;
 
@@ -14,11 +13,10 @@ public class Demo : MonoBehaviour
     private const string TAG = "Demo";
     
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        // SoundManagerTest();
+        SoundManagerTest();
         // ObjectPoolTest();
-        // WriteRecordTest();
         // GetIpTest();
         // LocalStorageTest();
         // TaskTest();
@@ -183,22 +181,11 @@ public class Demo : MonoBehaviour
     
     #endregion
 
-    #region WriteRecordTest
-
-    private async void WriteRecordTest()
-    {
-        await Task.Delay(3000);
-        gameObject.AddComponent<FileRecordQueueTest>();
-    }
-    
-    #endregion
-
     #region SoundManagerTest
 
     private void SoundManagerTest()
     {
-        SoundManager.InitData();
-        SoundManager.PlayMusic("bg");
+        GetComponentInChildren<SoundManagerTest>().InitTestButtons();
     }
     
     #endregion
@@ -210,9 +197,11 @@ public class Demo : MonoBehaviour
 #if UNITY_ANDROID
         DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetAndroidId());
         DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetRegionName());
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetLanguage());
 #elif UNITY_IOS
         DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetUUID());
         DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetRegionName());
+        DebugEx.Log(TAG, "NativeBridgeTest", NativeBridge.Instance.GetLanguage());
 #endif
     }
 

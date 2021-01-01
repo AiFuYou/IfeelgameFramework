@@ -2,9 +2,8 @@
 using System.Threading;
 using IfeelgameFramework.Core.Logger;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
-namespace IfeelgameFramework.Core.Tasks
+namespace IfeelgameFramework.Core.MainThreadTasks
 {
     public class MainThread
     {
@@ -32,7 +31,7 @@ namespace IfeelgameFramework.Core.Tasks
             
                 if (Application.isPlaying)
                 {
-                    Object.DontDestroyOnLoad(_mainThreadGameObject);
+                    UnityEngine.Object.DontDestroyOnLoad(_mainThreadGameObject);
                 }
                 
                 DebugEx.Log("MainThread()");

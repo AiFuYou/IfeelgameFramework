@@ -1,120 +1,99 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
-using Object = UnityEngine.Object;
+using UnityEngine.AddressableAssets;
 
 namespace IfeelgameFramework.Core.Sound
 {
     public static class SoundManager
     {
         private static GameObject _soundManagerGameObject;
-    
-        private static string _musicEnabled = "on";
-        private static float _musicVolume = 1.0f;
-        private static string _soundEnabled = "on";
-        private static float _soundVolume = 1.0f;
 
-        private static AudioSource _musicAudioSource;
-        private static List<AudioSource> _unusedAudioSources;
-        private static List<AudioSource> _usedAudioSources;
+        private static SoundSettings _soundSettings;
+
+        private static Dictionary<string, AudioSource> _musicAudioSourceDict;
+        private static bool _multipleBgmEnabled;
+        private static string _lastMusicBgmPath;
         private static Dictionary<string, AudioClip> _audioClips;
-        private const int MaxCount = 7;
+        private static AudioSource _soundAudioSource;
         
-        public static void InitData()
+        /// <summary>
+        /// 初始化音频模块
+        /// </summary>
+        /// <param name="multipleBgmEnabled">是否允许同时播放多个背景音乐，默认不允许</param>
+        public static void InitData(bool multipleBgmEnabled = false)
         {
-            //空闲播放器列表
-            _unusedAudioSources = new List<AudioSource>();
-            //正在使用播放器列表
-            _usedAudioSources = new List<AudioSource>();
+            //设置
+            _soundSettings = new SoundSettings();
+            
+            //是否允许同时播放多个背景音乐
+            _multipleBgmEnabled = multipleBgmEnabled;
+            
+            //初始化背景音乐表
+            _musicAudioSourceDict = new Dictionary<string, AudioSource>();
+            
             //音频片段表
             _audioClips = new Dictionary<string, AudioClip>();
-        
-            //添加音频播放组件
+
+            //添加SoundManagerComponent
             _soundManagerGameObject = new GameObject("SoundManager")
             {
                 hideFlags = HideFlags.HideAndDontSave
             };
             _soundManagerGameObject.AddComponent<SoundManagerComponent>();
-            
+
+            //添加音效播放器
+            _soundAudioSource = _soundManagerGameObject.AddComponent<AudioSource>();
+            _soundAudioSource.playOnAwake = false;
+            _soundAudioSource.loop = false;
+            _soundAudioSource.volume = _soundSettings.SoundVolume;
         }
 
-        //播放器回收
-        private static void UsedToUnused(AudioSource audioSource)
+        /// <summary>
+        /// 播放背景音乐
+        /// </summary>
+        /// <param name="bgmPath">背景音乐Path</param>
+        /// <param name="loop">是否循环，默认循环</param>
+        public static async void PlayMusic(string bgmPath, bool loop = true)
         {
-            if (audioSource != null)
+            if (!string.IsNullOrEmpty(_lastMusicBgmPath) && _lastMusicBgmPath == bgmPath) return;
+
+            if (!_multipleBgmEnabled && !string.IsNullOrEmpty(_lastMusicBgmPath))
             {
-                if (_usedAudioSources.Contains(audioSource))
+                if (_musicAudioSourceDict.ContainsKey(_lastMusicBgmPath))
                 {
-                    _usedAudioSources.Remove(audioSource);
+                    _musicAudioSourceDict[bgmPath] = _musicAudioSourceDict[_lastMusicBgmPath];
+                    _musicAudioSourceDict.Remove(_lastMusicBgmPath);
                 }
-
-                if (!_unusedAudioSources.Contains(audioSource))
-                {
-                    if (_unusedAudioSources.Count >= MaxCount)
-                    {
-                        Object.Destroy(audioSource);
-                    }
-                    else
-                    {
-                        _unusedAudioSources.Add(audioSource);
-                    }
-                }
-            }
-        }
-
-        //取出播放器
-        private static AudioSource UnusedToUsed()
-        {
-            AudioSource audioSource;
-            if (_unusedAudioSources.Count > 0)
-            {
-                audioSource = _unusedAudioSources[0];
-                _unusedAudioSources.RemoveAt(0);
-            }
-            else
-            {
-                audioSource = _soundManagerGameObject.AddComponent<AudioSource>();
-            }
-            _usedAudioSources.Add(audioSource);
-            return audioSource;
-        }
-
-        //等待播放器播放完成
-        private static IEnumerator WaitPlayEnd(AudioSource audioSource, Action action = null)
-        {
-            yield return new WaitUntil(() => !audioSource.isPlaying);
-            UsedToUnused(audioSource);
-            action?.Invoke();
-        }
-
-        //播放背景音乐
-        public static void PlayMusic(string bgmPath, float volume = 0.0f)
-        {
-            if (_musicAudioSource == null)
-            {
-                _musicAudioSource = UnusedToUsed();
             }
             
-            _musicAudioSource.clip = Resources.Load<AudioClip>(bgmPath);
-            _musicAudioSource.playOnAwake = false;
-            _musicAudioSource.loop = true;
-            _musicAudioSource.volume = volume > 0.0f ? volume : _musicVolume;
-            _musicAudioSource.Play();
+            if (!_musicAudioSourceDict.ContainsKey(bgmPath))
+            {
+                _musicAudioSourceDict[bgmPath] = _soundManagerGameObject.AddComponent<AudioSource>();
+            }
+
+            _musicAudioSourceDict[bgmPath].clip = await Addressables.LoadAssetAsync<AudioClip>(bgmPath).Task;
+            _musicAudioSourceDict[bgmPath].playOnAwake = false;
+            _musicAudioSourceDict[bgmPath].loop = loop;
+            _musicAudioSourceDict[bgmPath].volume = _soundSettings.MusicVolume;
+            _musicAudioSourceDict[bgmPath].Play();
 
             if (!GetMusicEnabled())
             {
-                _musicAudioSource.mute = true;
-                _musicAudioSource.Pause();
+                PauseBgm(bgmPath);
             }
+
+            _lastMusicBgmPath = bgmPath;
         }
 
-        //播放音效
-        public static void PlaySound(string soundPath, float volume = 0.0f)
+        /// <summary>
+        /// 播放音效
+        /// </summary>
+        /// <param name="soundPath">音效Path</param>
+        /// <param name="volume">音效音量</param>
+        public static async void PlaySound(string soundPath, float volume = 1.0f)
         {
             if (!GetSoundEnabled()) return;
-            var audioSource = UnusedToUsed();
-
+            
             AudioClip audioClip;
             if (_audioClips.ContainsKey(soundPath))
             {
@@ -122,90 +101,187 @@ namespace IfeelgameFramework.Core.Sound
             }
             else
             {
-                audioClip = Resources.Load<AudioClip>(soundPath);
+                audioClip = await Addressables.LoadAssetAsync<AudioClip>(soundPath).Task;
                 _audioClips.Add(soundPath, audioClip);
             }
 
-            audioSource.clip = audioClip;
-            audioSource.playOnAwake = false;
-            audioSource.loop = false;
-            audioSource.volume = volume > 0.0f? volume: _soundVolume;
-            audioSource.Play();
-            _soundManagerGameObject.GetComponent<SoundManagerComponent>().StartCoroutine(WaitPlayEnd(audioSource));
+            _soundAudioSource.PlayOneShot(audioClip, volume);
         }
 
-        //暂停背景音乐
-        public static void PauseBgm()
+        /// <summary>
+        /// 暂停背景音乐
+        /// </summary>
+        /// <param name="bgmPath">暂停指定的背景音乐，若传空则停止所有背景音乐</param>
+        public static void PauseBgm(string bgmPath = null)
         {
-            if (_musicAudioSource != null && _musicAudioSource.isPlaying)
+            if (bgmPath != null)
             {
-                _musicAudioSource.Pause();
+                if (_musicAudioSourceDict.ContainsKey(bgmPath))
+                {
+                    _musicAudioSourceDict[bgmPath].Pause();    
+                }
+            }
+            else
+            {
+                foreach (var item in _musicAudioSourceDict)
+                {
+                    item.Value.Pause();
+                }
             }
         }
 
-        //继续背景音乐
-        public static void ResumeBgm()
+        /// <summary>
+        /// 继续播放背景音乐
+        /// </summary>
+        /// <param name="bgmPath">继续播放指定背景音乐，若传空则继续播放所有背景音乐</param>
+        public static void ResumeBgm(string bgmPath = null)
         {
-            if (_musicAudioSource != null && !_musicAudioSource.isPlaying)
+            if (bgmPath != null)
             {
-                _musicAudioSource.Play();
+                if (_musicAudioSourceDict.ContainsKey(bgmPath) && !_musicAudioSourceDict[bgmPath].isPlaying)
+                {
+                    _musicAudioSourceDict[bgmPath].UnPause();    
+                }
+            }
+            else
+            {
+                foreach (var item in _musicAudioSourceDict)
+                {
+                    if (!item.Value.isPlaying)
+                    {
+                        item.Value.UnPause();
+                    }
+                }   
             }
         }
 
+        /// <summary>
+        /// 背景音乐是否在播放
+        /// </summary>
+        /// <param name="bgmPath">制定背景音乐是否在播放，若传空则判定是否有背景音乐在播放</param>
+        /// <returns></returns>
+        public static bool GetMusicIsPlaying(string bgmPath = null)
+        {
+            if (bgmPath != null)
+            {
+                if (_musicAudioSourceDict.ContainsKey(bgmPath) && _musicAudioSourceDict[bgmPath].isPlaying)
+                {
+                    return true;
+                }
+            }
+
+            foreach (var item in _musicAudioSourceDict)
+            {
+                if (item.Value.isPlaying)
+                {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+
+        /// <summary>
+        /// 打开背景音乐开关
+        /// </summary>
         public static void SetMusicOn()
         {
-            _musicEnabled = "on";
+            _soundSettings.MusicEnabled = true;
 
-            if (_musicAudioSource != null)
+            foreach (var item in _musicAudioSourceDict)
             {
-                _musicAudioSource.mute = false;
-                _musicAudioSource.Play();
+                item.Value.mute = false;
+                item.Value.Play();
             }
         }
 
+        /// <summary>
+        /// 关闭背景音乐开关
+        /// </summary>
         public static void SetMusicOff()
         {
-            _musicEnabled = "off";
-        
-            if (_musicAudioSource != null)
+            _soundSettings.MusicEnabled = false;
+
+            foreach (var item in _musicAudioSourceDict)
             {
-                _musicAudioSource.mute = true;
-                _musicAudioSource.Pause();
+                item.Value.mute = true;
+                item.Value.Stop();
             }
         }
 
-        private static bool GetMusicEnabled()
+        /// <summary>
+        /// 获取背景音乐开关
+        /// </summary>
+        /// <returns></returns>
+        public static bool GetMusicEnabled()
         {
-            return _musicEnabled == "on";
+            return _soundSettings.MusicEnabled;
         }
 
+        /// <summary>
+        /// 打开音效开关
+        /// </summary>
         public static void SetSoundOn()
         {
-            _soundEnabled = "on";
+            _soundSettings.SoundEnabled = true;
         }
 
+        /// <summary>
+        /// 关闭音效开关
+        /// </summary>
         public static void SetSoundOff()
         {
-            _soundEnabled = "off";
+            _soundSettings.SoundEnabled = false;
         }
 
-        private static bool GetSoundEnabled()
+        /// <summary>
+        /// 获取音效开关
+        /// </summary>
+        /// <returns></returns>
+        public static bool GetSoundEnabled()
         {
-            return _soundEnabled == "on";
+            return _soundSettings.SoundEnabled;
         }
     
+        /// <summary>
+        /// 设置背景音乐音量
+        /// </summary>
+        /// <param name="volume">音量值</param>
         public static void SetMusicVolume(float volume)
         {
-            _musicVolume = volume;
-            if (_musicAudioSource != null && _musicAudioSource.isPlaying)
+            _soundSettings.MusicVolume = volume;
+            foreach (var item in _musicAudioSourceDict)
             {
-                _musicAudioSource.volume = _musicVolume;
+                item.Value.volume = _soundSettings.MusicVolume;
             }
         }
 
+        /// <summary>
+        /// 获取背景音乐音量值
+        /// </summary>
+        /// <returns></returns>
+        public static float GetMusicVolume()
+        {
+            return _soundSettings.MusicVolume;
+        }
+
+        /// <summary>
+        /// 设置音效音量
+        /// </summary>
+        /// <param name="volume"></param>
         public static void SetSoundVolume(float volume)
         {
-            _soundVolume = volume;
+            _soundSettings.SoundVolume = volume;
+            _soundAudioSource.volume = _soundSettings.SoundVolume;
+        }
+
+        /// <summary>
+        /// 获取音效音量
+        /// </summary>
+        /// <returns></returns>
+        public static float GetSoundVolume()
+        {
+            return _soundSettings.SoundVolume;
         }
     }
 }

@@ -70,9 +70,10 @@ namespace IfeelgameFramework.Core.Storage
         /// 根据key和类型获取存储值，缺省为当前数据类型默认值
         /// </summary>
         /// <param name="k">key</param>
+        /// <param name="defaultValue">如果未存储过该数据，则返回defaultValue</param>
         /// <typeparam name="T">类型</typeparam>
         /// <returns>数据</returns>
-        public T GetValue<T>(string k)
+        public T GetValue<T>(string k, T defaultValue = default)
         {
             _rwLocks.EnterReadLock();
             try
@@ -81,7 +82,7 @@ namespace IfeelgameFramework.Core.Storage
                 {
                     return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(v));
                 }
-                return default;
+                return defaultValue;
             }
             finally
             {

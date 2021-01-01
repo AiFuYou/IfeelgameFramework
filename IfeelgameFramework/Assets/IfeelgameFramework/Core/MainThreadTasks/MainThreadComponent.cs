@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using IfeelgameFramework.Core.Logger;
 using UnityEngine;
 
-namespace IfeelgameFramework.Core.Tasks
+namespace IfeelgameFramework.Core.MainThreadTasks
 {
     [DefaultExecutionOrder(-100)]
     internal class MainThreadComponent : MonoBehaviour
