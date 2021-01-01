@@ -15,7 +15,7 @@ public class Demo : MonoBehaviour
     // Start is called before the first frame update
     void Awake()
     {
-        SoundManagerTest();
+        // SoundManagerTest();
         // ObjectPoolTest();
         // GetIpTest();
         // LocalStorageTest();
