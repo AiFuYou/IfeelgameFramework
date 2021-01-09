@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using IfeelgameFramework.Core.Awaiter;
 using IfeelgameFramework.Core.Logger;
 using IfeelgameFramework.Core.MainThreadTasks;
 using IfeelgameFramework.Core.Messenger;
@@ -22,6 +23,24 @@ public class Demo : MonoBehaviour
         // TaskTest();
         // MessengerTest();
         // NativeBridgeTest();
+        AwaiterTest();
+    }
+
+    private async void AwaiterTest()
+    {
+        var awaiter1 = new Awaiter();
+        StartCoroutine(Tools.Run(() => { awaiter1.Done(); }, 3));
+        
+        DebugEx.Log(TAG, "AwaiterTest", "awaiter1 等待中");
+        await awaiter1;
+        DebugEx.Log(TAG, "AwaiterTest", "awaiter1 Done");
+
+        var awaiter2 = new Awaiter<string>("测试awaiter返回值");
+        StartCoroutine(Tools.Run(() => { awaiter2.Done(); }, 3));
+        
+        DebugEx.Log(TAG, "AwaiterTest", "awaiter2 等待中");
+        var awaiterResult = await awaiter2;
+        DebugEx.Log(TAG, "AwaiterTest", "awaiter2 Done", awaiterResult);
     }
 
     #region MessengerTest
@@ -125,14 +144,14 @@ public class Demo : MonoBehaviour
     private async void GetIpTest()
     {
         //传入false，不等待结果返回
-        DebugEx.Log(await Tools.GetIpAsync(false));
+        DebugEx.Log(TAG, "不等待", await Tools.GetIpAsync(false));
 
         //默认传入true，等待网络结果返回
         var ip2 = await Tools.GetIpAsync();
-        DebugEx.Log(ip2);
+        DebugEx.Log(TAG, "等待", ip2);
         
-        DebugEx.Log(await Tools.GetIpAsync(false));
-        DebugEx.Log(await Tools.GetIpAsync());
+        DebugEx.Log(TAG, "不等待，但结果在上一步已返回", await Tools.GetIpAsync(false));
+        DebugEx.Log(TAG, "等待", await Tools.GetIpAsync());
     }
     
     #endregion

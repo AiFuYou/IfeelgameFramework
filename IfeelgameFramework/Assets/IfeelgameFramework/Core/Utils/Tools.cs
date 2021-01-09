@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Logger;
 using Newtonsoft.Json.Linq;
@@ -66,17 +67,19 @@ namespace IfeelgameFramework.Core.Utils
                     }
 
                     _responseIp =
-                        await _clientIp.GetAsync("http://ip-api.com/json/?fields=status,message,query");
+                        await _clientIp.GetAsync("https://api.myip.la");
                     _responseIp.EnsureSuccessStatusCode(); //用来抛异常的
                     var responseBody = await _responseIp.Content.ReadAsStringAsync();
                     DebugEx.Log(responseBody);
 
                     if (_responseIp.IsSuccessStatusCode)
                     {
-                        var result = JObject.Parse(responseBody);
-                        if ((string) result["status"] == "success")
+                        _ip = responseBody;
+                        
+                        var regex = new Regex(@"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$");
+                        if (!regex.IsMatch(_ip.Trim()))
                         {
-                            _ip = (string) result["query"];
+                            _ip = string.Empty;
                         }
                     }
                 }
