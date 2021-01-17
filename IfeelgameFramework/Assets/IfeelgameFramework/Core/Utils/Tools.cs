@@ -115,7 +115,7 @@ namespace IfeelgameFramework.Core.Utils
         /// <param name="action">方法</param>
         /// <param name="time">等待时间</param>
         /// <returns></returns>
-        public static IEnumerator Run(Action action, float time)
+        public static IEnumerator WaitForSeconds(Action action, float time)
         {
             yield return new WaitForSeconds(time);
             action();

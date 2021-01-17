@@ -2,6 +2,8 @@
 
 namespace IfeelgameFramework.Core.Awaiter
 {
+    #region INotifyCompletion
+    
     public interface IAwaitable<out TAwaiter> where TAwaiter : IAwaiter
     {
         TAwaiter GetAwaiter();
@@ -23,14 +25,32 @@ namespace IfeelgameFramework.Core.Awaiter
         bool IsCompleted { get; }
         TResult GetResult();
     }
-
-    public interface ICriticalAwaiter : IAwaiter, ICriticalNotifyCompletion
-    {
     
+    #endregion
+
+    #region ICriticalNotifyCompletion
+
+    public interface ICriticalAwaitable<out TCriticalAwaiter> where TCriticalAwaiter : ICriticalAwaiter
+    {
+        TCriticalAwaiter GetAwaiter();
     }
 
-    public interface ICriticalAwaiter<out TResult> : IAwaiter<TResult>, ICriticalNotifyCompletion
+    public interface ICriticalAwaitable<out TCriticalAwaiter, out TResult> where TCriticalAwaiter : ICriticalAwaiter<TResult>
     {
-    
+        TCriticalAwaiter GetAwaiter();
     }
+    
+    public interface ICriticalAwaiter : ICriticalNotifyCompletion
+    {
+        bool IsCompleted { get; }
+        void GetResult();
+    }
+
+    public interface ICriticalAwaiter<out TResult> :  ICriticalNotifyCompletion
+    {
+        bool IsCompleted { get; }
+        TResult GetResult();
+    }
+    
+    #endregion
 }

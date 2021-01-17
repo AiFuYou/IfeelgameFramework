@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Awaiter;
 using IfeelgameFramework.Core.Logger;
+using IfeelgameFramework.Core.Logger.Toast;
 using IfeelgameFramework.Core.MainThreadTasks;
 using IfeelgameFramework.Core.Messenger;
 using IfeelgameFramework.Core.ObjectPool;
@@ -23,25 +25,51 @@ public class Demo : MonoBehaviour
         // TaskTest();
         // MessengerTest();
         // NativeBridgeTest();
-        AwaiterTest();
+        // AwaiterTest();
+        // StartCoroutine(CoroutineTest());
+        // ToastTest();
     }
+
+    #region ToastTest
+
+    private async void ToastTest()
+    {
+        var count = 1;
+        while (Application.isPlaying)
+        {
+            CustomToast.Instance.ShowToast("Test CustomToast " + count);
+            ++count;
+            await Task.Delay(1000);
+        }
+    }
+
+    #endregion
+
+    #region CoroutineTest
+
+    private IEnumerator CoroutineTest()
+    {
+        DebugEx.Log("1");
+        var cc = new CustomCoroutine();
+        yield return cc;
+        DebugEx.Log("2");
+    }
+
+    #endregion
+
+    #region AwaiterTest
 
     private async void AwaiterTest()
     {
-        var awaiter1 = new Awaiter();
-        StartCoroutine(Tools.Run(() => { awaiter1.Done(); }, 3));
+        var awaiterTest = new Awaiter();
+        StartCoroutine(Tools.WaitForSeconds(() => { awaiterTest.Done(); }, 3));
         
-        DebugEx.Log(TAG, "AwaiterTest", "awaiter1 等待中");
-        await awaiter1;
-        DebugEx.Log(TAG, "AwaiterTest", "awaiter1 Done");
-
-        var awaiter2 = new Awaiter<string>("测试awaiter返回值");
-        StartCoroutine(Tools.Run(() => { awaiter2.Done(); }, 3));
-        
-        DebugEx.Log(TAG, "AwaiterTest", "awaiter2 等待中");
-        var awaiterResult = await awaiter2;
-        DebugEx.Log(TAG, "AwaiterTest", "awaiter2 Done", awaiterResult);
+        DebugEx.Log(TAG, "AwaiterTest", "awaiterTest 等待中");
+        await awaiterTest;
+        DebugEx.Log(TAG, "AwaiterTest", "awaiterTest Done");
     }
+    
+    #endregion
 
     #region MessengerTest
 
