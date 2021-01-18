@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using IfeelgameFramework.Core.Awaiter;
+using IfeelgameFramework.Core.Coroutine;
 using IfeelgameFramework.Core.Logger;
 using IfeelgameFramework.Core.Logger.Toast;
 using IfeelgameFramework.Core.MainThreadTasks;
@@ -50,7 +51,7 @@ public class Demo : MonoBehaviour
     private IEnumerator CoroutineTest()
     {
         DebugEx.Log("1");
-        var cc = new CustomCoroutine();
+        var cc = new CoroutineNumChange(0, 10, 60, f => DebugEx.Log(f));
         yield return cc;
         DebugEx.Log("2");
     }

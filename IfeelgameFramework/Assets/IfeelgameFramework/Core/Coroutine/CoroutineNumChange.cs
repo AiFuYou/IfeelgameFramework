@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections;
-using UnityEngine;
 
-namespace IfeelgameFramework.Core.Logger.Toast
+namespace IfeelgameFramework.Core.Coroutine
 {
     /// <summary>
     /// 自定义协程：数字变化
     /// </summary>
-    public class CoroutineNumChange : IEnumerator
+    public sealed class CoroutineNumChange : IEnumerator
     {
         private readonly float _numStart;
         private readonly float _numEnd;
@@ -22,7 +21,7 @@ namespace IfeelgameFramework.Core.Logger.Toast
         /// <param name="numEnd">结束数字</param>
         /// <param name="frameCount">所需帧数</param>
         /// <param name="moveNextCallback">每帧变化完成后的回调</param>
-        public CoroutineNumChange(float numStart, float numEnd, int frameCount, Action<float> moveNextCallback)
+        public CoroutineNumChange(float numStart, float numEnd, int frameCount, Action<float> moveNextCallback = null)
         {
             _numStart = numStart;
             _numEnd = numEnd;
