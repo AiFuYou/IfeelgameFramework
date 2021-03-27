@@ -1,4 +1,9 @@
-﻿using IfeelgameFramework.Core.Logger;
+﻿using System.Diagnostics;
+using System.IO;
+using IfeelgameFramework.Core.Logger;
+using UnityEditor;
+using UnityEditor.Android;
+using UnityEditor.Build.Reporting;
 
 namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
 {
@@ -25,11 +30,57 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
             }
         }
 
-        public void GenAndroidProj()
+        public void GenProj()
         {
-            DebugEx.Log("AndroidStudio工程修改");
+            BuildPlayerHelper.Log("AndroidStudio工程修改");
             
             //修改gradle文件
+        }
+
+        public void Package(BuildReport report)
+        {
+            var shScriptPath = BuildPlayerHelper.GetPath("build_android");
+            var projPath = report.summary.outputPath;
+            var gradlePath = AndroidExternalToolsSettings.gradlePath;
+            
+            //寻找gradle-launcher-*.jar文件
+            var files = Directory.GetFiles(gradlePath, "gradle-launcher-*.jar", SearchOption.AllDirectories);
+            if (files.Length > 0)
+            {
+                gradlePath = files[0];
+            }
+            else
+            {
+                BuildPlayerHelper.Error("not find file gradle-launcher-*.jar");
+                return;
+            }
+            
+            var psi = new ProcessStartInfo
+            {
+                FileName = "/bin/sh",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                Arguments = $"{shScriptPath} {projPath} {gradlePath} {(EditorUserBuildSettings.development ? "debug" : "release")}"
+            };
+
+            var p = Process.Start(psi);
+            if (p != null)
+            {
+                var strOutput = p.StandardOutput.ReadToEnd();
+                var errorOutput = p.StandardError.ReadToEnd();
+                p.WaitForExit();
+                BuildPlayerHelper.Log(strOutput);
+
+                if (!string.IsNullOrEmpty(errorOutput))
+                {
+                    BuildPlayerHelper.Error(errorOutput);    
+                }
+            }
+            else
+            {
+                BuildPlayerHelper.Error("build_android.sh executed failed");
+            }
         }
     }
 }

@@ -201,5 +201,13 @@ namespace IfeelgameFramework.Core.Storage
 
             _disposed = true;
         }
+
+        public void DelData()
+        {
+            if (File.Exists(_fileName))
+            {
+                File.Delete(_fileName);
+            }
+        }
     }
 }

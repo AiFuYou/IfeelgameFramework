@@ -11,9 +11,9 @@ namespace IfeelgameFramework.Core.Logger
     {
         #region Constant
 
-        private const string ColorLog = "green";
-        private const string ColorError = "red";
-        private const string ColorWarning = "orange";
+        public const string ColorLog = "green";
+        public const string ColorError = "red";
+        public const string ColorWarning = "orange";
 
         #endregion
 
@@ -140,7 +140,7 @@ namespace IfeelgameFramework.Core.Logger
         
         #region Other
 
-        private static object AddColor(object logStr, string colorStr)
+        public static object AddColor(object logStr, string colorStr)
         {
             return "<color=" + colorStr + ">" + logStr + "</color>";
         }

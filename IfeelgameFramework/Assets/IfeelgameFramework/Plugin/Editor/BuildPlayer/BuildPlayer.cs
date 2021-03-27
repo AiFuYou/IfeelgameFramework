@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using IfeelgameFramework.Core.Logger;
+using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -19,15 +19,33 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
         public void OnPreprocessBuild(BuildReport report)
         {
             //通用操作
-            DebugEx.Log(TAG, "OnPreprocessBuild", report.summary.platform, report.summary.outputPath);
+            BuildPlayerHelper.Log(TAG, "OnPreprocessBuild", report.summary.platform, report.summary.outputPath);
             
             // Start listening for errors when build starts
             Application.logMessageReceived += OnBuildError;
+
+            if (report.summary.platform == BuildTarget.Android)
+            { 
+                EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
+                // EditorUserBuildSettings.androidCreateSymbolsZip = true;//如果设置了exportAsGoogleAndroidProject为true，则此设置不生效
+
+                if (EditorUserBuildSettings.development)
+                {
+                    EditorUserBuildSettings.connectProfiler = true;
+                    EditorUserBuildSettings.buildWithDeepProfilingSupport = true;
+                    EditorUserBuildSettings.allowDebugging = true;
+                }
+            }
             
-            //根据LOG宏情况决定是否删除IfeelgameFramework里的Resources相关Debug资源
-#if !LOG
-            MoveAwayResources();
-#endif
+            //设置LOG宏定义
+            if (EditorUserBuildSettings.development)
+            {
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(report.summary.platformGroup, "LOG");    
+            }
+            else
+            {
+                PlayerSettings.SetScriptingDefineSymbolsForGroup(report.summary.platformGroup, "");
+            }
         }
 
         /// <summary>
@@ -37,10 +55,14 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
         public void OnPostprocessBuild(BuildReport report)
         {
             //通用操作
-            DebugEx.Log(TAG, "OnPostprocessBuild", report.summary.platform, report.summary.outputPath);
+            BuildPlayerHelper.Log(TAG, "OnPostprocessBuild", report.summary.platform, report.summary.outputPath);
 
-#if !LOG
-            MoveBackResources();
+            //build出工程之后对工程文件做相应的修改
+#if UNITY_ANDROID
+            BuildPlayerAndroid.Instance.GenProj();
+            BuildPlayerAndroid.Instance.Package(report);
+#elif UNITY_IOS
+            BuildPlayerIOS.Instance.GenProj();
 #endif
         }
         
@@ -56,65 +78,8 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
             {
                 // FAILED TO BUILD, STOP LISTENING FOR ERRORS
                 Application.logMessageReceived -= OnBuildError;
-
-#if !LOG
-                MoveBackResources();
-#endif
             }
         }
 
-        #region MoveAwayAndBackResources
-
-        private Dictionary<string, string> _oldNewPath = new Dictionary<string, string>();
-        private readonly string _newPath = Directory.GetCurrentDirectory() + "/IfeelgameFrameworkTemp/";
-
-        private void MoveAwayResources()
-        {
-            var ifeelgameFrameworkPath = Directory.GetCurrentDirectory() + "/Assets/IfeelgameFramework/";
-            var dir = new DirectoryInfo(ifeelgameFrameworkPath);
-        
-            ListDir(dir);
-
-            if (_oldNewPath.Count > 0)
-            {
-                foreach (var resourcesPath in _oldNewPath)
-                {
-                    Directory.Move(resourcesPath.Key, resourcesPath.Value);
-                }
-            }
-        }
-    
-        private void ListDir(DirectoryInfo dir)
-        {
-            if (dir.ToString().Contains("Resources"))
-            {
-                if (!Directory.Exists(_newPath))
-                {
-                    Directory.CreateDirectory(_newPath);
-                }
-                _oldNewPath.Add(dir.ToString(), _newPath + _oldNewPath.Count + "/");
-                return;
-            }
-        
-            if (dir.GetDirectories("*").Length > 0)
-            {
-                foreach (var dirChild in dir.GetDirectories("*"))
-                {
-                    ListDir(dirChild);
-                }
-            }   
-        }
-        
-        private void MoveBackResources()
-        {
-            foreach (var resourcesPath in _oldNewPath)
-            {
-                Directory.Move(resourcesPath.Value, resourcesPath.Key);
-            }
-        
-            Directory.Delete(_newPath);
-        }
-        
-        #endregion
     }
 }

@@ -145,5 +145,38 @@ namespace IfeelgameFramework.Core.Storage
                 }    
             }
         }
+
+        /// <summary>
+        /// 删除所有存储数据
+        /// </summary>
+        public void DeleteAllData()
+        {
+            if (!Directory.Exists(FilePath)) return;
+            Directory.Delete(FilePath, true);
+            Directory.CreateDirectory(FilePath);
+        }
+
+        /// <summary>
+        /// 删除指定存储数据
+        /// </summary>
+        /// <param name="fileName">存储文件名</param>
+        /// <param name="deleteLocalStorageObject">是否删除存储对象</param>
+        public void DeleteData(string fileName, bool deleteLocalStorageObject = false)
+        {
+            GetLocalStorage(fileName).DelData();
+            if (deleteLocalStorageObject)
+            {
+                ReleaseLocalStorage(fileName);
+            }
+        }
+
+        /// <summary>
+        /// 删除默认存储数据
+        /// </summary>
+        public void DeleteData()
+        {
+            DefaultLocalStorage.DelData();
+            _defaultLocalStorage = null;
+        }
     }
 }

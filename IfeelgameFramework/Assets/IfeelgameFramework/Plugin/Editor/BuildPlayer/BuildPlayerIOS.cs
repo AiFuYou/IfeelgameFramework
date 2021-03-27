@@ -25,13 +25,28 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
             }
         }
 
-        public void GenIOSProj()
+        public void GenProj()
         {
             DebugEx.Log("Xcode工程文件修改");
             
             //修改plist
             
             //修改project.pbxproj
+        }
+        
+        public void Package()
+        {
+            
+        }
+
+        private void PackageDebug()
+        {
+            
+        }
+
+        private void PackageRelease()
+        {
+            
         }
     }
 }
