@@ -10,17 +10,11 @@ public class SoundManagerTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if (!_init)
-        {
-            Destroy(gameObject);
-        }
+        
     }
 
-    private bool _init = false;
-    public void InitTestButtons()
+    public void InitTest()
     {
-        _init = true;
-        
         SoundManager.InitData();
         
         var btnBase = transform.Find("btnBase").gameObject;
@@ -51,6 +45,8 @@ public class SoundManagerTest : MonoBehaviour
             var btn = Instantiate(btnBase, transform, false);
             btn.name = btnText;
             btn.transform.GetComponentInChildren<Text>().text = btnText;
+            btn.transform.localPosition = new Vector2(0, posY);
+            posY -= offsetY;
             
             if (i <= 3)
             {
@@ -128,10 +124,6 @@ public class SoundManagerTest : MonoBehaviour
                         break;
                 }
             }
-            
-
-            btn.transform.localPosition = new Vector2(0, posY);
-            posY -= offsetY;
         }
 
         btnBase.gameObject.SetActive(false);
@@ -153,7 +145,7 @@ public class SoundManagerTest : MonoBehaviour
     private Text _closeOpenSound;
     private void UpdateBtnText()
     {
-        _pauseResumeMusic.text = SoundManager.GetMusicIsPlaying() ? "Pause Music" : "Resume Music";
+        _pauseResumeMusic.text = SoundManager.GetMusicIsPlaying() ? "Pause Music" : "Resume Music";//播放背景音乐为异步调用，所以第一次播放时此按钮的状态没有转变为Pause Music
         _closeOpenMusic.text = SoundManager.GetMusicEnabled() ? "Close Music" : "Open Music";
         _closeOpenSound.text = SoundManager.GetSoundEnabled() ? "Close Sound" : "Open Sound";
     }
