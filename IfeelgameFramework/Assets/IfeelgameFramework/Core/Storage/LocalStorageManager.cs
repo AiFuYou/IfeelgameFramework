@@ -9,9 +9,10 @@ namespace IfeelgameFramework.Core.Storage
     /// </summary>
     public class LocalStorageManager
     {
-        private static readonly string FilePath = Path.Combine(Application.persistentDataPath, "localstorage");
+        private static readonly string FileRootPath = Path.Combine(Application.persistentDataPath, "localstorage");
         private Dictionary<string, LocalStorage> _localStorages = null;
         private LocalStorage _defaultLocalStorage = null;
+        private readonly string _defaultFileName = "gameDefault.dat";
         private readonly object _dLock = new object();
         private readonly DefaultEncrypt _encryptor = new DefaultEncrypt();
         private LocalStorage DefaultLocalStorage
@@ -22,7 +23,7 @@ namespace IfeelgameFramework.Core.Storage
                 {
                     if (_defaultLocalStorage == null)
                     {
-                        _defaultLocalStorage = new LocalStorage(Path.Combine(FilePath, "gameDefault.dat"), _encryptor);
+                        _defaultLocalStorage = new LocalStorage(Path.Combine(FileRootPath, _defaultFileName), _encryptor);
                     }
                 }
                 return _defaultLocalStorage;
@@ -42,9 +43,9 @@ namespace IfeelgameFramework.Core.Storage
                 {
                     if (_instance == null)
                     {
-                        if (!Directory.Exists(FilePath))
+                        if (!Directory.Exists(FileRootPath))
                         {
-                            Directory.CreateDirectory(FilePath);
+                            Directory.CreateDirectory(FileRootPath);
                         }
                         _instance = new LocalStorageManager();
                     }
@@ -70,7 +71,7 @@ namespace IfeelgameFramework.Core.Storage
         /// <returns>存储对象</returns>
         public LocalStorage GetLocalStorage(string fileName, bool cache = false)
         {
-            var ls = new LocalStorage(Path.Combine(FilePath, fileName), _encryptor);
+            var ls = new LocalStorage(Path.Combine(FileRootPath, fileName), _encryptor);
             if (cache && !_localStorages.ContainsKey(fileName))
             {
                 _localStorages[fileName] = ls;
@@ -91,14 +92,23 @@ namespace IfeelgameFramework.Core.Storage
         }
 
         /// <summary>
+        /// 移除所有存储对象
+        /// </summary>
+        public void ReleaseAllLocalStorages()
+        {
+            _localStorages.Clear();
+        }
+
+        /// <summary>
         /// 根据key存储value，存入默认存储文件
         /// </summary>
         /// <param name="k">key</param>
         /// <param name="v">value</param>
         /// <param name="needSave">是否立即写入磁盘</param>
-        public void SetValue(string k, object v, bool needSave = false)
+        /// <param name="isAsyncSave">是否异步</param>
+        public void SetValue(string k, object v, bool needSave = false, bool isAsyncSave = false)
         {
-            DefaultLocalStorage.SetValue(k, v, needSave);
+            DefaultLocalStorage.SetValue(k, v, needSave, isAsyncSave);
         }
 
         /// <summary>
@@ -142,28 +152,32 @@ namespace IfeelgameFramework.Core.Storage
                 foreach (var item in _localStorages)
                 {
                     item.Value.SaveAsync();
-                }    
+                }
             }
         }
 
         /// <summary>
-        /// 删除所有存储数据
+        /// 删除所有存储数据，并清除所有的存储对象，慎重使用
         /// </summary>
-        public void DeleteAllData()
+        public void ClearAllData()
         {
-            if (!Directory.Exists(FilePath)) return;
-            Directory.Delete(FilePath, true);
-            Directory.CreateDirectory(FilePath);
+            if (!Directory.Exists(FileRootPath)) return;
+            
+            Directory.Delete(FileRootPath, true);
+            Directory.CreateDirectory(FileRootPath);
+            
+            ReleaseAllLocalStorages();
+            _defaultLocalStorage = null;
         }
 
         /// <summary>
-        /// 删除指定存储数据
+        /// 删除指定存储数据，如果要删除存储对象，请确保不会再使用
         /// </summary>
         /// <param name="fileName">存储文件名</param>
         /// <param name="deleteLocalStorageObject">是否删除存储对象</param>
-        public void DeleteData(string fileName, bool deleteLocalStorageObject = false)
+        public void ClearData(string fileName, bool deleteLocalStorageObject = false)
         {
-            GetLocalStorage(fileName).DelData();
+            GetLocalStorage(fileName).ClearData();
             if (deleteLocalStorageObject)
             {
                 ReleaseLocalStorage(fileName);
@@ -171,12 +185,11 @@ namespace IfeelgameFramework.Core.Storage
         }
 
         /// <summary>
-        /// 删除默认存储数据
+        /// 仅删除默认存储数据
         /// </summary>
-        public void DeleteData()
+        public void ClearData()
         {
-            DefaultLocalStorage.DelData();
-            _defaultLocalStorage = null;
+            DefaultLocalStorage.ClearData();
         }
     }
 }

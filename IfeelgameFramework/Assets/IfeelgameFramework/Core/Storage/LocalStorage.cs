@@ -26,32 +26,30 @@ namespace IfeelgameFramework.Core.Storage
         {
             _fileName = fileName;
             _encryptor = encryptor;
-            InitGameData();
+            InitData();
         }
 
         /// <summary>
         /// 初始化数据
         /// </summary>
-        private void InitGameData()
+        private void InitData()
         {
             if (_data == null)
             {
                 byte[] dataBytes = null;
                 if (File.Exists(_fileName))
                 {
-                    using (var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read))
+                    using var fs = new FileStream(_fileName, FileMode.Open, FileAccess.Read);
+                    try
                     {
-                        try
-                        {
-                            var bytes = new byte[fs.Length];
-                            fs.Read(bytes, 0, (int)fs.Length);
+                        var bytes = new byte[fs.Length];
+                        fs.Read(bytes, 0, (int)fs.Length);
 
-                            dataBytes = Encoding.UTF8.GetBytes(_encryptor.Decode(Encoding.UTF8.GetString(bytes)));
-                        }
-                        catch (Exception e)
-                        {
-                            DebugEx.Error(e.Message);
-                        }
+                        dataBytes = Encoding.UTF8.GetBytes(_encryptor.Decode(Encoding.UTF8.GetString(bytes)));
+                    }
+                    catch (Exception e)
+                    {
+                        DebugEx.Error(e.Message);
                     }
                 }
 
@@ -130,7 +128,7 @@ namespace IfeelgameFramework.Core.Storage
         {
             if (!_isDirty) return;
             _isDirty = false;
-            SaveGameDataInternal();
+            SaveInternal();
         }
 
         /// <summary>
@@ -140,35 +138,33 @@ namespace IfeelgameFramework.Core.Storage
         {
             if (!_isDirty) return;
             _isDirty = false;
-            Task.Run(SaveGameDataInternal);
+            Task.Run(SaveInternal);
         }
 
-        private void SaveGameDataInternal()
+        private void SaveInternal()
         {
             lock (_saveLock)
             {
-                using (var fs = new FileStream(_fileName, FileMode.Create))
+                using var fs = new FileStream(_fileName, FileMode.Create);
+                try
                 {
+                    _rwLocks.EnterReadLock();
                     try
                     {
-                        _rwLocks.EnterReadLock();
-                        try
-                        {
-                            _dataStr = JsonConvert.SerializeObject(_data);
-                        }
-                        finally
-                        {
-                            _rwLocks.ExitReadLock();
-                        }
-
-                        var bytes = Encoding.UTF8.GetBytes(_encryptor.Encode(_dataStr));
-                        fs.Write(bytes, 0, bytes.Length);
-                        fs.Flush();
+                        _dataStr = JsonConvert.SerializeObject(_data);
                     }
-                    catch (Exception e)
+                    finally
                     {
-                        DebugEx.Error(e.Message);
+                        _rwLocks.ExitReadLock();
                     }
+
+                    var bytes = Encoding.UTF8.GetBytes(_encryptor.Encode(_dataStr));
+                    fs.Write(bytes, 0, bytes.Length);
+                    fs.Flush();
+                }
+                catch (Exception e)
+                {
+                    DebugEx.Error(e.Message);
                 }
             }
         }
@@ -202,12 +198,13 @@ namespace IfeelgameFramework.Core.Storage
             _disposed = true;
         }
 
-        public void DelData()
+        /// <summary>
+        /// 当使用异步存储功能时，请谨慎使用
+        /// </summary>
+        public void ClearData()
         {
-            if (File.Exists(_fileName))
-            {
-                File.Delete(_fileName);
-            }
+            _data.Clear();
+            SaveInternal();
         }
     }
 }

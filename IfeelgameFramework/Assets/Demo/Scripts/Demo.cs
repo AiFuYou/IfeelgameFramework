@@ -124,46 +124,10 @@ public class Demo : MonoBehaviour
 
     #region LocalStorageTest
 
-    private class MyClass
-    {
-        public int a = 1;
-        public List<Dictionary<string, int>> e = new List<Dictionary<string, int>>();
-        public Dictionary<string, object> d = new Dictionary<string, object>();
-    }
-    
     private void LocalStorageTest()
     {
-        var ls = LocalStorageManager.Instance.GetLocalStorage("test");
-        // var ls = LocalStorageManager.Instance;
-
-        ls.SetValue("short", (short)1, true);
-        ls.SetValue("int", 1, true, true);
-        ls.SetValue("float", 1.1f, true);
-        ls.SetValue("long", (long)1, true, true);
-        ls.SetValue("bool", false, true);
-        ls.SetValue("string", "1231231", true, true);
-        ls.SetValue("double", 22.2, true);
-        
-        var myClass = new MyClass();
-        myClass.a = 3;
-        
-        var dic = new Dictionary<string, int> {{"s", 1}};
-        myClass.e.Add(dic);
-        myClass.d.Add("a", false);
-        
-        ls.SetValue("test", myClass, true);
-
-        var b1 = ls.GetValue<short>("short");
-        var b2 = ls.GetValue<int>("int");
-        var b3 = ls.GetValue<float>("float");
-        var b4 = ls.GetValue<long>("long");
-        var b5 = ls.GetValue<bool>("bool");
-        var b6 = ls.GetValue<double>("double");
-        var b7 = ls.GetValue<Dictionary<string, object>>("object");
-        var b8 = ls.GetValue<string>("string");
-        var b9 = ls.GetValue<MyClass>("test");
-
-        DebugEx.Log("111");
+        transform.Find("LocalStorageManagerTest").gameObject.SetActive(true);
+        GetComponentInChildren<LocalStorageManagerTest>().InitTest();
     }
     
     #endregion
@@ -233,7 +197,9 @@ public class Demo : MonoBehaviour
 
     private void SoundManagerTest()
     {
-        GetComponentInChildren<SoundManagerTest>().InitTestButtons();
+        var go = transform.Find("SoundManagerTest").gameObject;
+        go.SetActive(true);
+        go.GetComponent<SoundManagerTest>().InitTest();
     }
     
     #endregion
