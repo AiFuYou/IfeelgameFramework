@@ -6,6 +6,7 @@ namespace IfeelgameFramework.Core.Logger.Toast
 {
     public class CustomToast
     {
+        private CustomToast(){}
         private static CustomToast _instance;
         private static readonly object Padlock = new object();
         private static GameObject _toastGroupGameObject;

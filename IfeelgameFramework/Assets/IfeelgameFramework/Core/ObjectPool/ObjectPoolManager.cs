@@ -7,6 +7,8 @@ namespace IfeelgameFramework.Core.ObjectPool
     public class ObjectPoolManager
     {
         private readonly Dictionary<string, IObjectPool> _objectPoolDict = new Dictionary<string, IObjectPool>();
+        
+        private ObjectPoolManager(){}
         private static ObjectPoolManager _instance;
         private static readonly object LockPad = new object();
 

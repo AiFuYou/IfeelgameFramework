@@ -26,7 +26,7 @@ namespace IfeelgameFramework.Core.MainThreadTasks
         
             if (_mainThreadGameObject == null)
             {
-                _mainThreadGameObject = new GameObject("MainThreadGameObject") {hideFlags = HideFlags.HideAndDontSave};
+                _mainThreadGameObject = new GameObject("MainThreadGameObject") {hideFlags = HideFlags.DontSave};
                 _taskExecutor = _mainThreadGameObject.AddComponent<MainThreadComponent>();
             
                 if (Application.isPlaying)
