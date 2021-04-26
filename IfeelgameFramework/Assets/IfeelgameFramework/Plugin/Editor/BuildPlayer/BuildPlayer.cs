@@ -27,6 +27,7 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
             if (report.summary.platform == BuildTarget.Android)
             { 
                 EditorUserBuildSettings.exportAsGoogleAndroidProject = true;
+                EditorUserBuildSettings.buildAppBundle = false;
                 // EditorUserBuildSettings.androidCreateSymbolsZip = true;//如果设置了exportAsGoogleAndroidProject为true，则此设置不生效
 
                 if (EditorUserBuildSettings.development)

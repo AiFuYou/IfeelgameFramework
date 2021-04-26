@@ -61,10 +61,7 @@ namespace IfeelgameFramework.Core.Utils
             {
                 try
                 {
-                    if (_clientIp == null)
-                    {
-                        _clientIp = new HttpClient {Timeout = TimeSpan.FromSeconds(5)};
-                    }
+                    _clientIp ??= new HttpClient {Timeout = TimeSpan.FromSeconds(5)};
 
                     _responseIp =
                         await _clientIp.GetAsync("https://api.myip.la");

@@ -8,19 +8,18 @@ using IfeelgameFramework.Core.Logger.Toast;
 using IfeelgameFramework.Core.MainThreadTasks;
 using IfeelgameFramework.Core.Messenger;
 using IfeelgameFramework.Core.ObjectPool;
-using IfeelgameFramework.Core.Storage;
 using IfeelgameFramework.Core.Utils;
 using UnityEngine;
 
 public class Demo : MonoBehaviour
 {
     private const string TAG = "Demo";
-    
+
     // Start is called before the first frame update
     void Awake()
     {
         // SoundManagerTest();
-        // ObjectPoolTest();
+        // GameObjectPoolTest();
         // GetIpTest();
         // LocalStorageTest();
         // TaskTest();
@@ -64,21 +63,27 @@ public class Demo : MonoBehaviour
     {
         var awaiterTest = new Awaiter();
         StartCoroutine(Tools.WaitForSeconds(() => { awaiterTest.Done(); }, 3));
-        
+
         DebugEx.Log(TAG, "AwaiterTest", "awaiterTest 等待中");
         await awaiterTest;
         DebugEx.Log(TAG, "AwaiterTest", "awaiterTest Done");
     }
-    
+
     #endregion
 
     #region MessengerTest
 
     private void MessengerTest()
     {
-        Messenger.Instance.AddListener("test", LocalStorageTest);
+        Messenger.Instance.AddListener("test", MessengerFunc);
         Messenger.Instance.BroadCast("test");
-        Messenger.Instance.RemoveListener("test", LocalStorageTest);
+        Messenger.Instance.RemoveListener("test", MessengerFunc);
+        Messenger.Instance.BroadCast("test");
+    }
+
+    private void MessengerFunc()
+    {
+        DebugEx.Log("BroadCast");
     }
 
     #endregion

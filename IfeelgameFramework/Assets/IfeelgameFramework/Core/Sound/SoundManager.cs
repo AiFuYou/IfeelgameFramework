@@ -37,7 +37,7 @@ namespace IfeelgameFramework.Core.Sound
             //添加SoundManagerComponent
             _soundManagerGameObject = new GameObject("SoundManager")
             {
-                hideFlags = HideFlags.HideAndDontSave
+                hideFlags = HideFlags.DontSave
             };
             _soundManagerGameObject.AddComponent<SoundManagerComponent>();
 

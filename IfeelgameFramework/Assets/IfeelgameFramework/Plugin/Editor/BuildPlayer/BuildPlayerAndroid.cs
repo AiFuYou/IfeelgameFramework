@@ -9,11 +9,9 @@ namespace IfeelgameFramework.Plugin.Editor.BuildPlayer
 {
     public class BuildPlayerAndroid
     {
+        private BuildPlayerAndroid(){}
         private static BuildPlayerAndroid _instance;
         private static readonly object _insLock = new object();
-        /// <summary>
-        /// 实例化LocalStorageManager单例，并创建存储文件夹
-        /// </summary>
         public static BuildPlayerAndroid Instance
         {
             get
