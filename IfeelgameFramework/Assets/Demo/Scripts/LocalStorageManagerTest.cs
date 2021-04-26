@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using IfeelgameFramework.Core.Logger;
 using IfeelgameFramework.Core.Storage;
@@ -68,18 +69,6 @@ public class LocalStorageManagerTest : MonoBehaviour
         }
         
         btnBase.gameObject.SetActive(false);
-
-        var ls = LocalStorageManager.Instance.GetLocalStorage("test");
-
-        var b1 = ls.GetValue<short>("short");
-        var b2 = ls.GetValue<int>("int");
-        var b3 = ls.GetValue<float>("float");
-        var b4 = ls.GetValue<long>("long");
-        var b5 = ls.GetValue<bool>("bool");
-        var b6 = ls.GetValue<double>("double");
-        var b7 = ls.GetValue<Dictionary<string, object>>("object");
-        var b8 = ls.GetValue<string>("string");
-        var b9 = ls.GetValue<MyClass>("test");
     }
 
     private void SetValue()
@@ -125,11 +114,18 @@ public class LocalStorageManagerTest : MonoBehaviour
         var logStr = "";
         logStr += "short: " + lsT.GetValue<short>("short") + "\n";
         logStr += "int: " + lsT.GetValue<int>("int") + "\n";
+        logStr += "Int16: " + lsT.GetValue<Int16>("int") + "\n";
+        logStr += "Int32: " + lsT.GetValue<Int32>("int") + "\n";
+        logStr += "Int64: " + lsT.GetValue<Int64>("int") + "\n";
         logStr += "float: " + lsT.GetValue<float>("float") + "\n";
+        logStr += "Single: " + lsT.GetValue<Single>("float") + "\n";
         logStr += "long: " + lsT.GetValue<long>("long") + "\n";
         logStr += "bool: " + lsT.GetValue<bool>("bool") + "\n";
+        logStr += "Boolean: " + lsT.GetValue<Boolean>("bool") + "\n";
         logStr += "string: " + lsT.GetValue<string>("string") + "\n";
+        logStr += "String: " + lsT.GetValue<String>("string") + "\n";
         logStr += "double: " + lsT.GetValue<double>("double") + "\n";
+        logStr += "Double: " + lsT.GetValue<Double>("double") + "\n";
         logStr += "MyClass: " + JsonConvert.SerializeObject(lsT.GetValue<MyClass>("MyClass")) + "\n";
         
         DebugEx.Log(logStr);
@@ -139,11 +135,18 @@ public class LocalStorageManagerTest : MonoBehaviour
         logStr = "";
         logStr += "short: " + lsD.GetValue<short>("short") + "\n";
         logStr += "int: " + lsD.GetValue<int>("int") + "\n";
+        logStr += "Int16: " + lsD.GetValue<Int16>("int") + "\n";
+        logStr += "Int32: " + lsD.GetValue<Int32>("int") + "\n";
+        logStr += "Int64: " + lsD.GetValue<Int64>("int") + "\n";
         logStr += "float: " + lsD.GetValue<float>("float") + "\n";
+        logStr += "Single: " + lsD.GetValue<Single>("float") + "\n";
         logStr += "long: " + lsD.GetValue<long>("long") + "\n";
         logStr += "bool: " + lsD.GetValue<bool>("bool") + "\n";
+        logStr += "Boolean: " + lsD.GetValue<Boolean>("bool") + "\n";
         logStr += "string: " + lsD.GetValue<string>("string") + "\n";
+        logStr += "String: " + lsD.GetValue<String>("string") + "\n";
         logStr += "double: " + lsD.GetValue<double>("double") + "\n";
+        logStr += "Double: " + lsD.GetValue<Double>("double") + "\n";
         logStr += "MyClass: " + JsonConvert.SerializeObject(lsD.GetValue<MyClass>("MyClass")) + "\n";
         
         DebugEx.Log(logStr);
