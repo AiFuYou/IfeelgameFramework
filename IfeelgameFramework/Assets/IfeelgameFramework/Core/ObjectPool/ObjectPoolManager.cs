@@ -18,7 +18,7 @@ namespace IfeelgameFramework.Core.ObjectPool
             {
                 lock (LockPad)
                 {
-                    return _instance ?? (_instance = new ObjectPoolManager());
+                    return _instance ??= new ObjectPoolManager();
                 }
             }
         }

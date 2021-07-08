@@ -7,7 +7,7 @@ using System.Collections.Concurrent;
 
 namespace IfeelgameFramework.Core.ObjectPool
 {
-    public sealed class ObjectPool<T> : IObjectPool
+    public sealed class ObjectPool<T> : IObjectPool<T>
     {
         private readonly ConcurrentBag<T> _objects;
         private readonly Func<T> _objectGenerator;
